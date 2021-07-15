@@ -1,25 +1,25 @@
-const Sequelize = require('sequelize');
-const sequelize = new Sequelize('code_view','root','909090',{
-    host:'192.168.1.143',
-    dialect:'mysql',
+const Sequelize = require("sequelize")
+const sequelize = new Sequelize("yhbk", "root", "909090", {
+    host: "192.168.1.133",
+    dialect: "mysql",
     logging: false, // 关闭控制台日志
     // operatorsAliases:false,
-    dialectOptions:{
+    dialectOptions: {
         //字符集
-        charset:'utf8mb4',
+        charset: "utf8mb4",
         // collate:'utf8mb4_unicode_ci',
         supportBigNumbers: true,
         bigNumberStrings: true
     },
-    pool:{
+    pool: {
         max: 5,
         min: 0,
         acquire: 30000,
         idle: 10000
     },
-    timezone: '+08:00'  //东八时区
-});
- 
+    timezone: "+08:00" //东八时区
+})
+
 module.exports = {
     sequelize
 };

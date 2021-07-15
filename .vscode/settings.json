@@ -1,0 +1,43 @@
+{
+    // 开启 vscode 文件路径导航
+    "breadcrumbs.enabled": true,
+    // 控制资源管理器是否以紧凑形式显示文件夹  false: 不以紧凑形式显示
+    "explorer.compactFolders": false,
+    // tab 大小为4个空格
+    "editor.tabSize": 4,
+    // 120 列后换行
+    "editor.wordWrapColumn": 120,
+    // 设置 eslint 保存时自动修复
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": true
+    },
+    // eslint 检测文件类型
+    "eslint.probe": ["javascript", "html"],
+    "eslint.format.enable": true,
+    // vetur 的自定义设置
+    "vetur.format.enable": true,
+    "vetur.format.defaultFormatter.html": "prettyhtml",
+    "vetur.format.defaultFormatter.js": "prettier",
+    "vetur.format.defaultFormatterOptions": {
+        // "js-beautify-html": {
+        //     "wrap_attributes": "auto"
+        // },
+        "prettyhtml": {
+            "printWidth": 120
+        },
+        "prettier": {
+            "printWidth": 120,
+            "singleQuote": true,
+            "semi": false,
+            "trailingComma": "none"
+        }
+    },
+    "vetur.format.options.tabSize": 4,
+    "prettier.printWidth": 120,
+    "prettier.tabWidth": 4,
+    // prettier 设置语句末尾不加分号
+    "prettier.semi": false,
+    // prettier 设置强制单引号
+    "prettier.singleQuote": true,
+    "prettier.trailingComma": "none"
+}
