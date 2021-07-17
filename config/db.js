@@ -1,6 +1,8 @@
 const Sequelize = require("sequelize")
 const sequelize = new Sequelize("yhbk", "root", "909090", {
-    host: "192.168.1.133",
+    host: "localhost",
+    // host: "192.168.1.133",
+    // host: "api.youhebuke.com",
     dialect: "mysql",
     logging: false, // 关闭控制台日志
     // operatorsAliases:false,

@@ -1,57 +1,35 @@
-const TagModel = require("../modules/tag")
+const TagModel = require('../modules/tag')
+const check = require('../common/check')
 
 class TagController {
     static async list(ctx) {
         try {
             let params = ctx.request.body
 
-            if (params.page && (isNaN(params.page) || params.page < 0)) {
+            // 检测传入page limit orderby字段合规性
+            const checkResult = check.table(params)
+            if (checkResult) {
                 ctx.response.status = 200
                 ctx.body = {
-                    code: 2001,
-                    msg: "页码不合规"
+                    code: checkResult.code,
+                    msg: checkResult.msg
                 }
                 return
             }
 
-            if (params.limit && (isNaN(params.limit) || params.limit < 0)) {
-                ctx.response.status = 200
-                ctx.body = {
-                    code: 2002,
-                    msg: "每页显示条数不合规"
-                }
-                return
-            }
-
-            if (!!params.orderby && ['esc', 'desc', 'ESC', 'DESC'].indexOf(params.orderby) === -1) {
-                ctx.response.status = 200
-                ctx.body = {
-                    code: 2003,
-                    msg: "排序规则不合规"
-                }
-                return
-            }
-            
-            const data = await TagModel.list({
-                page: Number(params.page || 1),
-                limit: Number(params.limit || 10),
-                tagName: params.tagName,
-                isEqual: params.isEqual === 'true',
-                orderby: params.orderby || '',
-                orderName: params.orderName || ''
-            })
-
+            const data = await TagModel.list(params)
             ctx.response.status = 200
             ctx.body = {
-                code: 2000,
+                code: '00',
                 msg: "查询成功",
-                data
+                data: data
             }
         } catch (err) {
-            ctx.response.status = 900
+            const errors = check.errors()
+            ctx.response.status = errors.status
             ctx.body = {
-                code: 9000,
-                msg: '请求失败'
+                code: errors.code,
+                msg: errors.msg
             }
         }
     }
@@ -73,16 +51,16 @@ class TagController {
                 ctx.response.status = 200
                 ctx.body = {
                     code: 2002,
-                    msg: "标签名称过长"
+                    msg: "标签名称限10字符"
                 }
                 return
             }
-
+            // 查询是否存在同名标签
             let data = await TagModel.list({
                 tagName: params.tagName,
                 isEqual: true
             })
-
+            
             if (data.length) {
                 ctx.response.status = 200
                 ctx.body = {
