@@ -30,7 +30,7 @@ class TagModel {
         // 条件参数
         if (params.id) { filters.id = params.id }
         if (params.tagName) { filters.tagName = params.tagName }
-        if (params.isEqual) { filters.isEqual = params.isEqual === 'true' }
+        if (params.isEqual) { filters.isEqual = String(params.isEqual) === 'true' }
         
         // 查找条件
         let conditions = {}
@@ -76,10 +76,10 @@ class TagModel {
     }
 
     // 数据删除
-    static async del(id) {
+    static async del(params) {
         return await Tag.destroy({
             where: {
-                id
+                id: params.id
             }
         });
     }

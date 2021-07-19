@@ -1,36 +1,26 @@
 const TagModel = require('../modules/tag')
-const check = require('../common/check')
+const { throwSuccess, throwError, checkRules } = require('../common/response')
 
 class TagController {
     static async list(ctx) {
         try {
             let params = ctx.request.body
 
-            // 检测传入page limit orderby字段合规性
-            const checkResult = check.table(params)
-            if (checkResult) {
-                ctx.response.status = 200
-                ctx.body = {
-                    code: checkResult.code,
-                    msg: checkResult.msg
-                }
+            // 参数规则检测
+            const errorResponse = checkRules.list(params)
+            if (errorResponse) {
+                throwError(ctx, 'rules', errorResponse)
                 return
             }
 
             const data = await TagModel.list(params)
-            ctx.response.status = 200
-            ctx.body = {
-                code: '00',
+
+            throwSuccess(ctx, {
                 msg: "查询成功",
-                data: data
-            }
+                data
+            })
         } catch (err) {
-            const errors = check.errors()
-            ctx.response.status = errors.status
-            ctx.body = {
-                code: errors.code,
-                msg: errors.msg
-            }
+            throwError(ctx, 500)
         }
     }
 
@@ -38,56 +28,36 @@ class TagController {
         try {
             let params = ctx.request.body
 
-            if (!params.tagName) {
-                ctx.response.status = 200
-                ctx.body = {
-                    code: 2001,
-                    msg: "请传入标签名称"
-                }
+            // 参数规则检测
+            const errorResponse = checkRules.input('标签名', params.tagName, { required: true, max: 10 })
+            if (errorResponse) {
+                throwError(ctx, 'rules', errorResponse)
                 return
             }
 
-            if (params.tagName.length > 10) {
-                ctx.response.status = 200
-                ctx.body = {
-                    code: 2002,
-                    msg: "标签名称限10字符"
-                }
-                return
-            }
             // 查询是否存在同名标签
             let data = await TagModel.list({
                 tagName: params.tagName,
                 isEqual: true
             })
-            
+
             if (data.length) {
-                ctx.response.status = 200
-                ctx.body = {
-                    code: 2003,
-                    msg: "标签名称已存在"
-                }
+                throwError(ctx, 'isExist', { field: 'tagName', value: params.tagName })
                 return
             }
-            
+            // 执行写入
             const item = await TagModel.add(params)
             //使用刚刚创建的ID查询，且返回详情信息
             data = await TagModel.list({
                 id: item.id
             })
 
-            ctx.response.status = 200
-            ctx.body = {
-                code: 2000,
+            throwSuccess(ctx, {
                 msg: "添加成功",
-                data
-            }
+                data: data[0]
+            })
         } catch (err) {
-            ctx.response.status = 900
-            ctx.body = {
-                code: 9000,
-                msg: '请求失败'
-            }
+            throwError(ctx, 500)
         }
     }
 
@@ -95,50 +65,47 @@ class TagController {
         try {
             let params = ctx.request.body
 
-            if (!params.id) {
-                ctx.response.status = 200
-                ctx.body = {
-                    code: 2001,
-                    msg: "id不存在"
-                }
+            // 参数规则检测
+            const errorResponse =
+                checkRules.input('id', params.id, { required: true }) ||
+                checkRules.input('标签名', params.tagName, { required: true, max: 10 })
+
+            if (errorResponse) {
+                throwError(ctx, 'rules', errorResponse)
                 return
             }
 
-            if (params.tagName.length > 10) {
-                ctx.response.status = 200
-                ctx.body = {
-                    code: 2002,
-                    msg: "标签名称过长"
-                }
-                return
-            }
-
+            // 查询是否存在同名
             let data = await TagModel.list({
                 tagName: params.tagName,
                 isEqual: true
             })
-
             if (data.length) {
-                ctx.response.status = 200
-                ctx.body = {
-                    code: 2003,
-                    msg: "标签名称已存在"
-                }
+                throwError(ctx, 'isExist', { field: 'tagName', value: params.tagName })
                 return
             }
 
-            await TagModel.edit(params)
-            ctx.response.status = 200
-            ctx.body = {
-                code: 2000,
-                msg: "修改成功"
+            // 查询是否存在
+            data = await TagModel.list({
+                id: params.id
+            })
+            if (data.length === 0) {
+                throwError(ctx, 'notExist')
+                return
             }
+
+            // 执行写入
+            const item = await TagModel.edit(params)
+            data = await TagModel.list({
+                id: item.id
+            })
+
+            throwSuccess(ctx, {
+                msg: "修改成功",
+                data: data[0]
+            })
         } catch (err) {
-            ctx.response.status = 900
-            ctx.body = {
-                code: 9000,
-                msg: '请求失败'
-            }
+            throwError(ctx, 500)
         }
     }
 
@@ -146,42 +113,34 @@ class TagController {
         try {
             let params = ctx.request.body
 
-            if (!params.id) {
-                ctx.response.status = 200
-                ctx.body = {
-                    code: 2001,
-                    msg: "id不存在"
-                }
+            // 参数规则检测
+            const errorResponse = checkRules.input('id', params.id, { required: true })
+
+            if (errorResponse) {
+                throwError(ctx, 'rules', errorResponse)
                 return
             }
 
+            // 查询是否存在
             let data = await TagModel.list({
                 id: params.id
             })
-
             if (data.length === 0) {
-                ctx.response.status = 200
-                ctx.body = {
-                    code: 2002,
-                    msg: "数据不存在"
-                }
+                throwError(ctx, 'notExist')
                 return
             }
+
+            // 执行写入
             await TagModel.del({
                 id: params.id
             })
-            ctx.response.status = 200
-            ctx.body = {
-                code: 2000,
+
+            throwSuccess(ctx, {
                 msg: "删除成功"
-            }
+            })
 
         } catch (err) {
-            ctx.response.status = 900
-            ctx.body = {
-                code: 9000,
-                msg: '请求失败'
-            }
+            throwError(ctx, 500)
         }
     }
 }
