@@ -1,7 +1,7 @@
-const TagModel = require('../modules/tag')
+const UserModel = require('../modules/user')
 const { throwSuccess, throwError, checkRules } = require('../common/response')
 
-class TagController {
+class UserController {
     static async list(ctx) {
         try {
             let params = ctx.request.body
@@ -13,7 +13,7 @@ class TagController {
                 return
             }
 
-            const data = await TagModel.list(params)
+            const data = await UserModel.list(params)
 
             throwSuccess(ctx, {
                 msg: "查询成功",
@@ -29,26 +29,30 @@ class TagController {
             let params = ctx.request.body
 
             // 参数规则检测
-            const errorResponse = checkRules.input('标签名', params.tagName, { required: true, max: 10 })
+            const errorResponse = 
+                checkRules.input('用户名', params.userName, { required: true, reg: /^[\u4e00-\u9fa5a-zA-Z0-9_]{4,16}$/ }) ||
+                checkRules.input('密码', params.password, { required: true, reg: /^[a-zA-Z0-9~!@#$%^&*()+=|{}\-_]{4,16}$/ })
+            
             if (errorResponse) {
                 throwError(ctx, 'rules', errorResponse)
                 return
             }
-
+            
             // 查询是否存在同名标签
-            let data = await TagModel.list({
-                tagName: params.tagName,
+            let data = await UserModel.list({
+                userName: params.userName,
                 isEqual: true
             })
-
+            
             if (data.length) {
-                throwError(ctx, 'isExist', { msg: params.tagName + '已存在' })
+                throwError(ctx, 'isExist', { msg: '用户名已存在' })
                 return
             }
+            
             // 执行写入
-            const item = await TagModel.add(params)
+            const item = await UserModel.add(params)
             //使用刚刚创建的ID查询，且返回详情信息
-            data = await TagModel.list({
+            data = await UserModel.list({
                 id: item.id
             })
 
@@ -68,7 +72,7 @@ class TagController {
             // 参数规则检测
             const errorResponse =
                 checkRules.input('id', params.id, { required: true }) ||
-                checkRules.input('标签名', params.tagName, { required: true, max: 10 })
+                checkRules.input('标签名', params.userName, { required: true, max: 10 })
 
             if (errorResponse) {
                 throwError(ctx, 'rules', errorResponse)
@@ -76,27 +80,27 @@ class TagController {
             }
 
             // 查询是否存在同名
-            let data = await TagModel.list({
-                tagName: params.tagName,
+            let data = await UserModel.list({
+                userName: params.userName,
                 isEqual: true
             })
             if (data.length) {
-                throwError(ctx, 'isExist', { msg: params.tagName + '已存在' })
+                throwError(ctx, 'isExist', { msg: '用户名已存在' })
                 return
             }
 
             // 查询是否存在
-            data = await TagModel.list({
+            data = await UserModel.list({
                 id: params.id
             })
             if (data.length === 0) {
-                throwError(ctx, 'notExist', { msg: '该数据不存在' })
+                throwError(ctx, 'notExist', { msg: '该用户不存在' })
                 return
             }
 
             // 执行写入
-            const item = await TagModel.edit(params)
-            data = await TagModel.list({
+            const item = await UserModel.edit(params)
+            data = await UserModel.list({
                 id: item.id
             })
 
@@ -122,16 +126,16 @@ class TagController {
             }
 
             // 查询是否存在
-            let data = await TagModel.list({
+            let data = await UserModel.list({
                 id: params.id
             })
             if (data.length === 0) {
-                throwError(ctx, 'notExist', { msg: '该数据不存在' })
+                throwError(ctx, 'notExist', { msg: '该用户不存在' })
                 return
             }
 
             // 执行写入
-            await TagModel.del({
+            await UserModel.del({
                 id: params.id
             })
 
@@ -145,4 +149,4 @@ class TagController {
     }
 }
 
-module.exports = TagController
+module.exports = UserController

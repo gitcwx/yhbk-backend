@@ -45,9 +45,9 @@ const throwError = (ctx, type, params) => {
         // 规则错误
         case 'rules': result = { status: 200, code: params.code, msg: params.msg }; break
         // 数据库存在相同数据
-        case 'isExist': result = { status: 200, code: 'e21', msg: `${params.value}已存在` }; break
+        case 'isExist': result = { status: 200, code: 'e21', msg: params.msg }; break
         // 不存在该数据
-        case 'notExist': result = { status: 200, code: 'e22', msg: `该数据不存在` }; break
+        case 'notExist': result = { status: 200, code: 'e22', msg: params.msg }; break
         // 其他默认500
         case 500:  result = { status: 500, code: 'e99', msg: '服务器内部错误' };
     }
