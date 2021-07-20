@@ -29,7 +29,13 @@ class TagController {
             let params = ctx.request.body
 
             // 参数规则检测
-            const errorResponse = checkRules.input('标签名', params.tagName, { required: true, max: 10 })
+            const errorResponse = checkRules.inputs([
+                {
+                    msgLabel: '标签名',
+                    value: params.tagName,
+                    rules: { required: true, max: 10 }
+                }
+            ])
             if (errorResponse) {
                 throwError(ctx, 'rules', errorResponse)
                 return
@@ -40,21 +46,17 @@ class TagController {
                 tagName: params.tagName,
                 isEqual: true
             })
-
             if (data.length) {
                 throwError(ctx, 'isExist', { msg: params.tagName + '已存在' })
                 return
             }
+
             // 执行写入
-            const item = await TagModel.add(params)
-            //使用刚刚创建的ID查询，且返回详情信息
-            data = await TagModel.list({
-                id: item.id
-            })
+            data = await TagModel.add(params)
 
             throwSuccess(ctx, {
                 msg: "添加成功",
-                data: data[0]
+                data: data
             })
         } catch (err) {
             throwError(ctx, 500)
@@ -67,8 +69,21 @@ class TagController {
 
             // 参数规则检测
             const errorResponse =
-                checkRules.input('id', params.id, { required: true }) ||
-                checkRules.input('标签名', params.tagName, { required: true, max: 10 })
+                checkRules.inputs([
+                    {
+                        msgLabel: 'id',
+                        value: params.id,
+                        rules: { required: true }
+                    },
+                    {
+                        msgLabel: '标签名',
+                        value: params.tagName,
+                        rules: {
+                            required: true,
+                            max: 10
+                        }
+                    }
+                ])
 
             if (errorResponse) {
                 throwError(ctx, 'rules', errorResponse)
@@ -114,7 +129,13 @@ class TagController {
             let params = ctx.request.body
 
             // 参数规则检测
-            const errorResponse = checkRules.input('id', params.id, { required: true })
+            const errorResponse = checkRules.inputs([
+                {
+                    msgLabel: 'id',
+                    value: params.id,
+                    rules: { required: true }
+                }
+            ])
 
             if (errorResponse) {
                 throwError(ctx, 'rules', errorResponse)

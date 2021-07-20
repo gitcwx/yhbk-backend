@@ -18,6 +18,18 @@ module.exports = function (sequelize, DataTypes) {
             allowNull: false,
             field: "password",
         },
+        // 盐
+        salt: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            field: "salt",
+        },
+        // 上次登录时间
+        lastLoginAt: {
+            type: DataTypes.DATE,
+            allowNull: true,
+            field: 'lastLoginAt'
+        },
         // 创建时间
         createdAt: {
             type: DataTypes.DATE,
@@ -25,7 +37,7 @@ module.exports = function (sequelize, DataTypes) {
         // 更新时间
         updatedAt: {
             type: DataTypes.DATE,
-        },
+        }
     }, {
         /**
          * 如果为true，则表示名称和model相同，即user

@@ -29,7 +29,7 @@ class UserModel {
         filters.page = Number(params.page || 1)
         filters.limit = Number(params.limit || 10)
         filters.orderby = params.orderby || 'desc'
-        filters.orderName = params.orderName || 'updatedAt'
+        filters.orderName = params.orderName || 'createdAt'
         // 条件参数
         if (params.id) { filters.id = params.id }
         if (params.userName) { filters.userName = params.userName }
@@ -51,6 +51,7 @@ class UserModel {
         }
         
         return await User.findAll({
+            attributes: ['id', 'userName', 'lastLoginAt', 'createdAt'],
             limit: filters.limit,
             offset: (filters.page - 1) * filters.limit,
             where: conditions,
@@ -58,6 +59,32 @@ class UserModel {
                 [filters.orderName, filters.orderby]
             ]
         })
+    }
+
+    // 查找用户
+    static async findOne(params) {
+        const conditions = {}
+        if (params.id) {
+            conditions.id = params.id
+        }
+        if (params.userName) {
+            conditions.userName = params.userName
+        }
+        
+        return await User.findOne({
+            where: conditions
+        })
+    }
+
+    // 登录
+    static async login(params) {
+        return await User.update({
+            lastLoginAt: new Date()
+        }, {
+            where: {
+                id: params.id
+            }
+        });
     }
     
     // 数据插入
@@ -72,11 +99,32 @@ class UserModel {
         })
     }
 
-    // 数据编辑
-    static async edit(params) {
+    // 修改密码
+    static async password(params) {
+        const salt = UUID()
+        const password = await MD5(params.newPassword, salt)
+        
         return await User.update({
-            userName: params.userName
+            salt,
+            password,
+            updatedAt: new Date()
         }, {
+            where: {
+                id: params.id
+            }
+        });
+    }
+
+    // 数据编辑
+    static async info(params) {
+        const conditions = {}
+        if (params.userName) {
+            conditions.userName = params.userName
+        }
+
+        params.updatedAt = new Date()
+
+        return await User.update(conditions, {
             where: {
                 id: params.id
             }
