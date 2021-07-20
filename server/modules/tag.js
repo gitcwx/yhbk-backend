@@ -20,43 +20,51 @@ Tag.sync({ force: true }).then(() => {
 class TagModel {
     // 查询列表
     static async list(params) {
-        // 过滤参数
-        const filters = {}
-        // 常驻参数
-        filters.page = Number(params.page || 1)
-        filters.limit = Number(params.limit || 10)
-        filters.orderby = params.orderby || 'desc'
-        filters.orderName = params.orderName || 'updatedAt'
-        // 条件参数
-        if (params.id) { filters.id = params.id }
-        if (params.tagName) { filters.tagName = params.tagName }
-        if (params.isEqual) { filters.isEqual = String(params.isEqual) === 'true' }
-        
+        // 分页相关参数
+        const pager = {}
+        pager.page = Number(params.page || 1)
+        pager.limit = Number(params.limit || 10)
+        pager.orderby = params.orderby || 'desc'
+        pager.orderName = params.orderName || 'updatedAt'
+
         // 查找条件
         let conditions = {}
-        if (filters.id) {
-            // id精确查找
-            conditions.id = filters.id
-        } else if (filters.isEqual && filters.tagName) {
+        // 查找条件
+        if (String(params.isEqual) === 'true' && params.tagName) {
             // 名称精确查找
-            conditions.tagName = filters.tagName
-        } else if (filters.tagName) {
+            conditions.tagName = params.tagName
+        } else if (params.tagName) {
             // 名称包含查找
             conditions.tagName = {
-                [Op.substring]: filters.tagName
+                [Op.substring]: params.tagName
             }
         }
 
         return await Tag.findAll({
-            limit: filters.limit,
-            offset:  (filters.page - 1) * filters.limit,
+            limit: pager.limit,
+            offset:  (pager.page - 1) * pager.limit,
             where: conditions,
             order: [
-                [filters.orderName, filters.orderby]
+                [pager.orderName, pager.orderby]
             ]
         })
     }
-    
+
+    // 查询单条数据
+    static async findOne(params) {
+        const conditions = {}
+        if (params.id) {
+            conditions.id = params.id
+        }
+        if (params.tagName) {
+            conditions.tagName = params.tagName
+        }
+        
+        return await Tag.findOne({
+            where: conditions
+        })
+    }
+
     // 数据插入
     static async add(params) {
         return await Tag.create({

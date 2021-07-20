@@ -57,6 +57,21 @@ class ArticleModel {
         })
     }
     
+    // 单项查找
+    static async findOne(params) {
+        const conditions = {}
+        if (params.id) {
+            conditions.id = params.id
+        }
+        if (params.articleName) {
+            conditions.articleName = params.articleName
+        }
+        
+        return await Article.findOne({
+            where: conditions
+        })
+    }
+
     // 数据插入
     static async add(params) {
         return await Article.create({

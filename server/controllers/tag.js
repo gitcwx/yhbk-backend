@@ -14,7 +14,6 @@ class TagController {
             }
 
             const data = await TagModel.list(params)
-
             throwSuccess(ctx, {
                 msg: "查询成功",
                 data
@@ -42,21 +41,19 @@ class TagController {
             }
 
             // 查询是否存在同名标签
-            let data = await TagModel.list({
-                tagName: params.tagName,
-                isEqual: true
+            let data = await TagModel.findOne({
+                tagName: params.tagName
             })
-            if (data.length) {
+            if (data) {
                 throwError(ctx, 'isExist', { msg: params.tagName + '已存在' })
                 return
             }
 
             // 执行写入
             data = await TagModel.add(params)
-
             throwSuccess(ctx, {
                 msg: "添加成功",
-                data: data
+                data
             })
         } catch (err) {
             throwError(ctx, 500)
@@ -68,56 +65,46 @@ class TagController {
             let params = ctx.request.body
 
             // 参数规则检测
-            const errorResponse =
-                checkRules.inputs([
-                    {
-                        msgLabel: 'id',
-                        value: params.id,
-                        rules: { required: true }
-                    },
-                    {
-                        msgLabel: '标签名',
-                        value: params.tagName,
-                        rules: {
-                            required: true,
-                            max: 10
-                        }
-                    }
-                ])
-
+            const errorResponse = checkRules.inputs([
+                {
+                    msgLabel: 'id',
+                    value: params.id,
+                    rules: { required: true }
+                },
+                {
+                    msgLabel: '标签名',
+                    value: params.tagName,
+                    rules: { required: true, max: 10 }
+                }
+            ])
             if (errorResponse) {
                 throwError(ctx, 'rules', errorResponse)
                 return
             }
 
             // 查询是否存在同名
-            let data = await TagModel.list({
-                tagName: params.tagName,
-                isEqual: true
+            let data = await TagModel.findOne({
+                tagName: params.tagName
             })
-            if (data.length) {
+            if (data) {
                 throwError(ctx, 'isExist', { msg: params.tagName + '已存在' })
                 return
             }
 
             // 查询是否存在
-            data = await TagModel.list({
+            data = await TagModel.findOne({
                 id: params.id
             })
-            if (data.length === 0) {
+            if (!data) {
                 throwError(ctx, 'notExist', { msg: '该数据不存在' })
                 return
             }
 
             // 执行写入
-            const item = await TagModel.edit(params)
-            data = await TagModel.list({
-                id: item.id
-            })
-
+            await TagModel.edit(params)
             throwSuccess(ctx, {
                 msg: "修改成功",
-                data: data[0]
+                data: null
             })
         } catch (err) {
             throwError(ctx, 500)
@@ -136,26 +123,22 @@ class TagController {
                     rules: { required: true }
                 }
             ])
-
             if (errorResponse) {
                 throwError(ctx, 'rules', errorResponse)
                 return
             }
 
             // 查询是否存在
-            let data = await TagModel.list({
+            let data = await TagModel.findOne({
                 id: params.id
             })
-            if (data.length === 0) {
+            if (!data) {
                 throwError(ctx, 'notExist', { msg: '该数据不存在' })
                 return
             }
 
             // 执行写入
-            await TagModel.del({
-                id: params.id
-            })
-
+            await TagModel.del(params)
             throwSuccess(ctx, {
                 msg: "删除成功"
             })

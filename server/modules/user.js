@@ -23,45 +23,38 @@ User.sync({ force: true }).then(() => {
 class UserModel {
     // 查询列表
     static async list(params) {
-        // 过滤参数
-        const filters = {}
+        // 分页相关参数
+        const pager = {}
         // 常驻参数
-        filters.page = Number(params.page || 1)
-        filters.limit = Number(params.limit || 10)
-        filters.orderby = params.orderby || 'desc'
-        filters.orderName = params.orderName || 'createdAt'
-        // 条件参数
-        if (params.id) { filters.id = params.id }
-        if (params.userName) { filters.userName = params.userName }
-        if (params.isEqual) { filters.isEqual = String(params.isEqual) === 'true' }
+        pager.page = Number(params.page || 1)
+        pager.limit = Number(params.limit || 10)
+        pager.orderby = params.orderby || 'desc'
+        pager.orderName = params.orderName || 'createdAt'
         
         // 查找条件
         let conditions = {}
-        if (filters.id) {
-            // id精确查找
-            conditions.id = filters.id
-        } else if (filters.isEqual && filters.userName) {
+        if (String(params.isEqual) === 'true' && params.userName) {
             // 名称精确查找
-            conditions.userName = filters.userName
-        } else if (filters.userName) {
+            conditions.userName = params.userName
+        } else if (params.userName) {
             // 名称包含查找
             conditions.userName = {
-                [Op.substring]: filters.userName
+                [Op.substring]: params.userName
             }
         }
         
         return await User.findAll({
             attributes: ['id', 'userName', 'lastLoginAt', 'createdAt'],
-            limit: filters.limit,
-            offset: (filters.page - 1) * filters.limit,
+            limit: pager.limit,
+            offset: (pager.page - 1) * pager.limit,
             where: conditions,
             order: [
-                [filters.orderName, filters.orderby]
+                [pager.orderName, pager.orderby]
             ]
         })
     }
 
-    // 查找用户
+    // 单项查找
     static async findOne(params) {
         const conditions = {}
         if (params.id) {
@@ -121,7 +114,6 @@ class UserModel {
         if (params.userName) {
             conditions.userName = params.userName
         }
-
         params.updatedAt = new Date()
 
         return await User.update(conditions, {
