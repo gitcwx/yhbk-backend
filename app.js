@@ -7,6 +7,7 @@ const onerror = require('koa-onerror')
 const bodyparser = require('koa-bodyparser')
 const logger = require('koa-logger')
 const fs = require('fs')
+const path = require('path')
 
 // jwt token验证
 // const koaJwt = require('koa-jwt');
@@ -35,10 +36,10 @@ app.use(
 )
 app.use(json())
 app.use(logger())
-app.use(require('koa-static')(__dirname + '/public'))
+app.use(require('koa-static')(path.join(__dirname, '/public')))
 
 app.use(
-    views(__dirname + '/views', {
+    views(path.join(__dirname, '/views'), {
         extension: 'pug'
     })
 )
@@ -53,13 +54,13 @@ app.use(async (ctx, next) => {
 
 // routes
 function addRoutes() {
-    const files = fs.readdirSync(__dirname + '/routes')
-    const js_files = files.filter((f) => {
+    const files = fs.readdirSync(path.join(__dirname, '/routes'))
+    const jsFiles = files.filter((f) => {
         return f.endsWith('.js')
     })
 
-    for (const f of js_files) {
-        const mapping = require(__dirname + '/routes/' + f)
+    for (const f of jsFiles) {
+        const mapping = require(path.join(__dirname, '/routes/', f))
         app.use(mapping.routes(), mapping.allowedMethods())
     }
 }

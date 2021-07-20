@@ -23,7 +23,7 @@ module.exports = {
         semi: ['error', 'never'], // 必须在语句后面不加分号
         // "quotes": ["error", "double"],// 字符串没有使用单引号
         quotes: ['error', 'single'], // 字符串没有使用单引号
-        'no-console': ['error', { allow: ['log', 'warn'] }], // 允许使用console.log()
+        'no-console': ['error', { allow: ['log', 'warn', 'error'] }], // 允许使用console.log()
         'arrow-parens': 0,
         'no-new': 0// 允许使用 new 关键字
     }
