@@ -4,7 +4,7 @@ const { throwSuccess, throwError, checkRules } = require('../common/response')
 class TagController {
     static async list(ctx) {
         try {
-            let params = ctx.request.body
+            const params = ctx.request.body
 
             // 参数规则检测
             const errorResponse = checkRules.list(params)
@@ -15,7 +15,7 @@ class TagController {
 
             const data = await TagModel.list(params)
             throwSuccess(ctx, {
-                msg: "查询成功",
+                msg: '查询成功',
                 data
             })
         } catch (err) {
@@ -25,7 +25,7 @@ class TagController {
 
     static async add(ctx) {
         try {
-            let params = ctx.request.body
+            const params = ctx.request.body
 
             // 参数规则检测
             const errorResponse = checkRules.inputs([
@@ -52,7 +52,7 @@ class TagController {
             // 执行写入
             data = await TagModel.add(params)
             throwSuccess(ctx, {
-                msg: "添加成功",
+                msg: '添加成功',
                 data
             })
         } catch (err) {
@@ -62,7 +62,7 @@ class TagController {
 
     static async edit(ctx) {
         try {
-            let params = ctx.request.body
+            const params = ctx.request.body
 
             // 参数规则检测
             const errorResponse = checkRules.inputs([
@@ -103,7 +103,7 @@ class TagController {
             // 执行写入
             await TagModel.edit(params)
             throwSuccess(ctx, {
-                msg: "修改成功",
+                msg: '修改成功',
                 data: null
             })
         } catch (err) {
@@ -113,7 +113,7 @@ class TagController {
 
     static async del(ctx) {
         try {
-            let params = ctx.request.body
+            const params = ctx.request.body
 
             // 参数规则检测
             const errorResponse = checkRules.inputs([
@@ -129,7 +129,7 @@ class TagController {
             }
 
             // 查询是否存在
-            let data = await TagModel.findOne({
+            const data = await TagModel.findOne({
                 id: params.id
             })
             if (!data) {
@@ -140,9 +140,8 @@ class TagController {
             // 执行写入
             await TagModel.del(params)
             throwSuccess(ctx, {
-                msg: "删除成功"
+                msg: '删除成功'
             })
-
         } catch (err) {
             throwError(ctx, 500)
         }

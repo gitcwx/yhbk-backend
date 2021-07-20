@@ -1,21 +1,21 @@
 // 引入mysql的配置文件
-const db = require("../../config/db")
+const db = require('../../config/db')
 
 // 引入sequelize对象
-const Sequelize = require("sequelize")
+const Sequelize = require('sequelize')
 const Op = Sequelize.Op
 
 // 引入数据表模型
-const Tag = db.sequelize.import("../schema/tag")
+const Tag = db.sequelize.import('../schema/tag')
 
 // 引入默认数据
-const defaultData = require("../defaults/tag")
+const defaultData = require('../defaults/tag')
 
 // 自动创建表 `force: true` 表存在时先删除表
 Tag.sync({ force: true }).then(() => {
     // 默认数据写入表
     return Tag.bulkCreate(defaultData)
-});
+})
 
 class TagModel {
     // 查询列表
@@ -28,7 +28,7 @@ class TagModel {
         pager.orderName = params.orderName || 'updatedAt'
 
         // 查找条件
-        let conditions = {}
+        const conditions = {}
         // 查找条件
         if (String(params.isEqual) === 'true' && params.tagName) {
             // 名称精确查找
@@ -42,7 +42,7 @@ class TagModel {
 
         return await Tag.findAll({
             limit: pager.limit,
-            offset:  (pager.page - 1) * pager.limit,
+            offset: (pager.page - 1) * pager.limit,
             where: conditions,
             order: [
                 [pager.orderName, pager.orderby]
@@ -59,7 +59,7 @@ class TagModel {
         if (params.tagName) {
             conditions.tagName = params.tagName
         }
-        
+
         return await Tag.findOne({
             where: conditions
         })
@@ -80,7 +80,7 @@ class TagModel {
             where: {
                 id: params.id
             }
-        });
+        })
     }
 
     // 数据删除
@@ -89,8 +89,8 @@ class TagModel {
             where: {
                 id: params.id
             }
-        });
+        })
     }
 }
 
-module.exports = TagModel;
+module.exports = TagModel

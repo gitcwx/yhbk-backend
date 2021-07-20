@@ -8,10 +8,11 @@ class UserController {
     static async register(ctx, next) {
         await UserController.add(ctx, next, true)
     }
+
     // 登录
     static async login(ctx) {
         try {
-            let params = ctx.request.body
+            const params = ctx.request.body
 
             // 参数规则检测
             const errorResponse = checkRules.inputs([
@@ -32,7 +33,7 @@ class UserController {
             }
 
             // 查询用户是否存在
-            let data = await UserModel.findOne({
+            const data = await UserModel.findOne({
                 userName: params.userName
             })
             if (!data) {
@@ -48,16 +49,17 @@ class UserController {
 
             await UserModel.login(data)
             throwSuccess(ctx, {
-                msg: "登录成功"
+                msg: '登录成功'
             })
         } catch (err) {
             throwError(ctx, 500)
         }
     }
+
     // 用户列表
     static async list(ctx) {
         try {
-            let params = ctx.request.body
+            const params = ctx.request.body
 
             // 参数规则检测
             const errorResponse = checkRules.list(params)
@@ -68,17 +70,18 @@ class UserController {
 
             const data = await UserModel.list(params)
             throwSuccess(ctx, {
-                msg: "查询成功",
+                msg: '查询成功',
                 data
             })
         } catch (err) {
             throwError(ctx, 500)
         }
     }
+
     // 新增用户
     static async add(ctx, next, isRegister) {
         try {
-            let params = ctx.request.body
+            const params = ctx.request.body
 
             // 参数规则检测
             const errorResponse = checkRules.inputs([
@@ -117,14 +120,15 @@ class UserController {
             throwError(ctx, 500)
         }
     }
-    //修改密码
+
+    // 修改密码
     static async password (ctx) {
         try {
-            let params = ctx.request.body
+            const params = ctx.request.body
 
             // 参数规则检测
             const errorResponse = checkRules.inputs([
-                { 
+                {
                     msgLabel: 'id',
                     value: params.id,
                     rules: { required: true }
@@ -146,7 +150,7 @@ class UserController {
             }
 
             // 查询是否存在
-            let data = await UserModel.findOne({
+            const data = await UserModel.findOne({
                 id: params.id
             })
             if (!data) {
@@ -160,20 +164,21 @@ class UserController {
                 throwError(ctx, 'notMatch', { msg: '原密码错误' })
                 return
             }
-            
+
             // 执行写入
             await UserModel.password(params)
             throwSuccess(ctx, {
-                msg: "修改成功"
+                msg: '修改成功'
             })
         } catch (err) {
             throwError(ctx, 500)
         }
     }
+
     // 修改用户资料
     static async info(ctx) {
         try {
-            let params = ctx.request.body
+            const params = ctx.request.body
 
             // 参数规则检测
             const errorResponse = checkRules.inputs([
@@ -201,7 +206,7 @@ class UserController {
                 throwError(ctx, 'notExist', { msg: '该用户不存在' })
                 return
             }
-            
+
             // 查询是否存在同名
             data = await UserModel.findOne({
                 userName: params.userName
@@ -210,20 +215,21 @@ class UserController {
                 throwError(ctx, 'isExist', { msg: '用户名已存在' })
                 return
             }
-            
+
             // 执行写入
             await UserModel.info(params)
             throwSuccess(ctx, {
-                msg: "修改成功"
+                msg: '修改成功'
             })
         } catch (err) {
             throwError(ctx, 500)
         }
     }
+
     // 删除用户
     static async del(ctx) {
         try {
-            let params = ctx.request.body
+            const params = ctx.request.body
 
             // 参数规则检测
             const errorResponse = checkRules.inputs([
@@ -239,7 +245,7 @@ class UserController {
             }
 
             // 查询是否存在
-            let data = await UserModel.findOne({
+            const data = await UserModel.findOne({
                 id: params.id
             })
             if (!data) {
@@ -250,9 +256,8 @@ class UserController {
             // 执行写入
             await UserModel.del(params)
             throwSuccess(ctx, {
-                msg: "删除成功"
+                msg: '删除成功'
             })
-
         } catch (err) {
             throwError(ctx, 500)
         }

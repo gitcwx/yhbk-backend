@@ -1,28 +1,28 @@
 module.exports = function (sequelize, DataTypes) {
-    return sequelize.define("user", {
+    return sequelize.define('user', {
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
             allowNull: true,
-            autoIncrement: true,
+            autoIncrement: true
         },
         // 用户名
         userName: {
             type: DataTypes.STRING,
             allowNull: false,
-            field: "userName",
+            field: 'userName'
         },
         // 密码
         password: {
             type: DataTypes.STRING,
             allowNull: false,
-            field: "password",
+            field: 'password'
         },
         // 盐
         salt: {
             type: DataTypes.STRING,
             allowNull: false,
-            field: "salt",
+            field: 'salt'
         },
         // 上次登录时间
         lastLoginAt: {
@@ -32,11 +32,11 @@ module.exports = function (sequelize, DataTypes) {
         },
         // 创建时间
         createdAt: {
-            type: DataTypes.DATE,
+            type: DataTypes.DATE
         },
         // 更新时间
         updatedAt: {
-            type: DataTypes.DATE,
+            type: DataTypes.DATE
         }
     }, {
         /**
@@ -44,6 +44,6 @@ module.exports = function (sequelize, DataTypes) {
          * 如果为fasle，mysql创建的表名称会是复数，即users
          * 如果指定的表名称本身就是复数，则形式不变
          */
-        freezeTableName: true,
-    });
-};
+        freezeTableName: true
+    })
+}

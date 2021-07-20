@@ -1,11 +1,11 @@
-const jwt = require("jsonwebtoken")
-const jwtSecret = "token"
+const jwt = require('jsonwebtoken')
+const jwtSecret = 'token'
 
 module.exports = function () {
     return async function check(ctx, next) {
-        let url = ctx.url.split("?")[0]
+        const url = ctx.url.split('?')[0]
 
-        let token = ctx.request.headers["token"]
+        const token = ctx.request.headers.token
         // let token = jwt.sign(
         //   { name: "test", id: "123456" }, // 加密userToken
         //   jwtSecret,
@@ -13,16 +13,16 @@ module.exports = function () {
         // );
         // console.log(token)
         if (token) {
-            const result = jwt.verify(token, "token")
-            let data = new Date().getTime() / 1000
+            const result = jwt.verify(token, 'token')
+            const data = new Date().getTime() / 1000
             if (data <= result.exp) {
                 await next()
             } else {
                 ctx.body = {
                     status: 405,
-                    message: "token 已过期，请重新登陆"
-                };
+                    message: 'token 已过期，请重新登陆'
+                }
             }
         }
     }
-};
+}
