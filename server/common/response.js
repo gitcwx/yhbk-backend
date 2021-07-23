@@ -2,6 +2,10 @@
 // eslint-disable-next-line no-unused-vars
 const status = {
     200: 'success',
+    401: '认证失败',
+    403: '权限不足',
+    404: '请求资源未找到',
+    405: 'token已过期',
     500: '服务器内部错误'
 }
 // 业务相应码
@@ -47,13 +51,19 @@ const throwError = (ctx, type, params) => {
     switch (type) {
     // 规则错误
     case 'rules': result = { status: 200, code: params.code, msg: params.msg }; break
-        // 数据库存在相同数据
+    // 数据库存在相同数据
     case 'isExist': result = { status: 200, code: 'e21', msg: params.msg }; break
-        // 不存在该数据
+    // 不存在该数据
     case 'notExist': result = { status: 200, code: 'e22', msg: params.msg }; break
-        // 数据不匹配
+    // 数据不匹配
     case 'notMatch': result = { status: 200, code: 'e23', msg: params.msg }; break
-        // 其他默认500
+
+    // token认证失败
+    case 401: result = { status: 401, code: 'e81', msg: 'token认证失败' }; break
+    case 403: result = { status: 403, code: 'e83', msg: '权限不足' }; break
+    case 404: result = { status: 404, code: 'e84', msg: '请求资源未找到' }; break
+    case 405: result = { status: 405, code: 'e85', msg: 'token已过期' }; break
+    // 其他默认500
     case 500: result = { status: 500, code: 'e99', msg: '服务器内部错误' }
     }
 

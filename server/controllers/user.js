@@ -2,6 +2,9 @@ const UserModel = require('../modules/user')
 const { throwSuccess, throwError, checkRules } = require('../common/response')
 // 引入md5加密方法
 const { MD5 } = require('../../util/encrypt')
+// token
+const jwt = require('jsonwebtoken')
+const auth = require('../../util/auth')
 
 class UserController {
     // 注册
@@ -46,10 +49,17 @@ class UserController {
                 throwError(ctx, 'notMatch', { msg: '用户名或者密码错误' })
                 return
             }
-
+            const token = jwt.sign(
+                { userName: data.userName, password: data.password, salt: data.salt },
+                auth.sign,
+                { expiresIn: '1h' }
+            )
             await UserModel.login(data)
             throwSuccess(ctx, {
-                msg: '登录成功'
+                msg: '登录成功',
+                data: {
+                    token
+                }
             })
         } catch (err) {
             throwError(ctx, 500)
@@ -68,10 +78,11 @@ class UserController {
                 return
             }
 
-            const data = await UserModel.list(params)
+            const result = await UserModel.list(params)
             throwSuccess(ctx, {
                 msg: '查询成功',
-                data
+                data: result.rows,
+                total: result.count
             })
         } catch (err) {
             throwError(ctx, 500)
@@ -112,10 +123,24 @@ class UserController {
 
             // 执行写入
             data = await UserModel.add(params)
-            throwSuccess(ctx, {
-                msg: isRegister ? '注册成功' : '新增成功',
-                data
-            })
+            if (isRegister) {
+                const token = jwt.sign(
+                    { userName: data.userName, password: data.password, salt: data.salt },
+                    auth.sign,
+                    { expiresIn: '1h' }
+                )
+                throwSuccess(ctx, {
+                    msg: '注册成功',
+                    data: {
+                        token
+                    }
+                })
+            } else {
+                throwSuccess(ctx, {
+                    msg: '新增成功',
+                    data
+                })
+            }
         } catch (err) {
             throwError(ctx, 500)
         }

@@ -40,7 +40,7 @@ class TagModel {
             }
         }
 
-        return await Tag.findAll({
+        return await Tag.findAndCountAll({
             limit: pager.limit,
             offset: (pager.page - 1) * pager.limit,
             where: conditions,

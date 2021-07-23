@@ -43,7 +43,7 @@ class UserModel {
             }
         }
 
-        return await User.findAll({
+        return await User.findAndCountAll({
             attributes: ['id', 'userName', 'lastLoginAt', 'createdAt'],
             limit: pager.limit,
             offset: (pager.page - 1) * pager.limit,

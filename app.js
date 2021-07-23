@@ -8,20 +8,9 @@ const bodyparser = require('koa-bodyparser')
 const logger = require('koa-logger')
 const fs = require('fs')
 const path = require('path')
-
 // jwt token验证
-// const koaJwt = require('koa-jwt');
-// const checkToken = require('./middlewares/checkToken')
-// const jwtSecret = 'token';
-
-// app.use(checkToken())
-
-// 不需验证token的路由
-// app.use(
-//   koaJwt({ secret: jwtSecret }).unless({
-//     path: [/^\/login/],
-//   })
-// );
+const koaJwt = require('koa-jwt')
+const auth = require('./util/auth')
 
 // error handler
 onerror(app)
@@ -29,6 +18,11 @@ onerror(app)
 // 允许跨域
 app.use(cors())
 // middlewares
+app.use(koaJwt({ secret: 'token' }).unless({
+    path: ['/api/user/login']
+}))
+app.use(auth.check())
+
 app.use(
     bodyparser({
         enableTypes: ['json', 'form', 'text']

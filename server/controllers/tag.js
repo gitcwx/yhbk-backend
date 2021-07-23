@@ -13,10 +13,11 @@ class TagController {
                 return
             }
 
-            const data = await TagModel.list(params)
+            const result = await TagModel.list(params)
             throwSuccess(ctx, {
                 msg: '查询成功',
-                data
+                data: result.rows,
+                total: result.count
             })
         } catch (err) {
             throwError(ctx, 500)
