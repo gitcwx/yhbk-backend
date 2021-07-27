@@ -4,8 +4,7 @@ const { throwSuccess, throwError, checkRules } = require('../common/response')
 const { MD5 } = require('../../util/encrypt')
 // token
 const jwt = require('jsonwebtoken')
-const auth = require('../../util/auth')
-
+const { tokenKey, tokenExpiresTime } = require('../../config/token')
 class UserController {
     // 注册
     static async register(ctx, next) {
@@ -51,8 +50,8 @@ class UserController {
             }
             const token = jwt.sign(
                 { userName: data.userName, password: data.password, salt: data.salt },
-                auth.sign,
-                { expiresIn: '1h' }
+                tokenKey,
+                { expiresIn: tokenExpiresTime }
             )
             await UserModel.login(data)
             throwSuccess(ctx, {
@@ -126,8 +125,8 @@ class UserController {
             if (isRegister) {
                 const token = jwt.sign(
                     { userName: data.userName, password: data.password, salt: data.salt },
-                    auth.sign,
-                    { expiresIn: '1h' }
+                    tokenKey,
+                    { expiresIn: tokenExpiresTime }
                 )
                 throwSuccess(ctx, {
                     msg: '注册成功',

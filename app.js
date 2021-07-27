@@ -10,18 +10,33 @@ const fs = require('fs')
 const path = require('path')
 // jwt token验证
 const koaJwt = require('koa-jwt')
-const auth = require('./util/auth')
+const { tokenKey } = require('./config/token')
+const { throwError } = require('./server/common/response')
 
 // error handler
 onerror(app)
 
 // 允许跨域
 app.use(cors())
-// middlewares
-app.use(koaJwt({ secret: 'token' }).unless({
-    path: ['/api/user/login']
-}))
-app.use(auth.check())
+
+// token验证处理
+app.use(async (ctx, next) => {
+    return next().catch((err) => {
+        if (err.originalError && err.originalError.message === 'jwt expired') {
+            throwError(ctx, 405)
+        } else {
+            throwError(ctx, 401)
+        }
+    })
+})
+// token验证拦截
+app.use(
+    koaJwt({
+        secret: tokenKey
+    }).unless({
+        path: [/login/, '/api/user/register']
+    })
+)
 
 app.use(
     bodyparser({
