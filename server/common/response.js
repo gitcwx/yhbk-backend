@@ -38,8 +38,6 @@ const throwSuccess = (ctx, params) => {
     ctx.response.status = 200
     ctx.body = {
         code: '00',
-        msg: null,
-        data: null,
         ...params
     }
 }
@@ -74,79 +72,78 @@ const throwError = (ctx, type, params) => {
     }
 }
 
-const checkRules = {
-    list: (params) => {
-        // 判断页码 page
-        if (
-            // false [null, 0, NaN, -Number]
-            // true  [undefined, '', +inter]
-            params.page !== undefined && !/^$|^[1-9]\d{0,2}$/.test(params.page)
-        ) {
-            return { code: 'e01', msg: '页码不合规' }
-        }
-
-        // 判断每页条数 limit
-        if (
-            // false [null, 0, NaN, -Number]
-            // true  [undefined, '', +inter]
-            params.limit !== undefined && !/^$|^[1-9]\d{0,2}$/.test(params.limit)
-        ) {
-            return { code: 'e02', msg: '每页显示条数不合规' }
-        }
-
-        // 判断排序规则
-        if (
-            // false  [other]
-            // true   [undefined, '', 'asc'/i, 'desc'/i]
-            params.orderby !== undefined && !/^$|^(de|a)sc$/i.test(params.orderby)
-        ) {
-            return { code: 'e03', msg: '排序规则不合规' }
-        }
-
-        // 判断排序字段是否为表中字段
-
-        return undefined
-    },
-    inputs (data) {
-        let result
-        for (let i = 0; i < data.length; i++) {
-            const msgLabel = data[i].msgLabel
-            const value = data[i].value
-            const rules = data[i].rules
-
-            // 判断非空
-            if (
-                !value && rules.required
-            ) {
-                result = { code: 'e11', msg: `${msgLabel}不可为空` }
-                break
-            }
-
-            // 判断字符长度
-            if (
-                value !== undefined && (
-                    (rules.max && value.length > rules.max) ||
-                    (rules.min && value.length < rules.min)
-                )
-            ) {
-                result = { code: 'e12', msg: `${msgLabel}长度不合规` }
-                break
-            }
-
-            // 正则判断
-            if (
-                rules.reg && !rules.reg.test(value)
-            ) {
-                result = { code: 'e13', msg: `${msgLabel}格式不合规` }
-                break
-            }
-        }
-
-        return result
+const pagerVerify = (params) => {
+    // 判断页码 page
+    if (
+        // false [null, 0, NaN, -Number]
+        // true  [undefined, '', +inter]
+        params.page !== undefined && !/^$|^[1-9]\d{0,2}$/.test(params.page)
+    ) {
+        return { code: 'e01', msg: '页码不合规' }
     }
+
+    // 判断每页条数 limit
+    if (
+        // false [null, 0, NaN, -Number]
+        // true  [undefined, '', +inter]
+        params.limit !== undefined && !/^$|^[1-9]\d{0,2}$/.test(params.limit)
+    ) {
+        return { code: 'e02', msg: '每页显示条数不合规' }
+    }
+
+    // 判断排序规则
+    if (
+        // false  [other]
+        // true   [undefined, '', 'asc'/i, 'desc'/i]
+        params.orderby !== undefined && !/^$|^(de|a)sc$/i.test(params.orderby)
+    ) {
+        return { code: 'e03', msg: '排序规则不合规' }
+    }
+
+    // 判断排序字段是否为表中字段
+
+    return undefined
+}
+const paramsVerify = (data) => {
+    let result
+    for (let i = 0; i < data.length; i++) {
+        const msgLabel = data[i].msgLabel
+        const value = data[i].value
+        const rules = data[i].rules
+
+        // 判断非空
+        if (
+            !value && rules.required
+        ) {
+            result = { code: 'e11', msg: `${msgLabel}不可为空` }
+            break
+        }
+
+        // 判断字符长度
+        if (
+            value !== undefined && (
+                (rules.max && value.length > rules.max) ||
+                (rules.min && value.length < rules.min)
+            )
+        ) {
+            result = { code: 'e12', msg: `${msgLabel}长度不合规` }
+            break
+        }
+
+        // 正则判断
+        if (
+            rules.reg && !rules.reg.test(value)
+        ) {
+            result = { code: 'e13', msg: `${msgLabel}格式不合规` }
+            break
+        }
+    }
+
+    return result
 }
 module.exports = {
     throwSuccess,
     throwError,
-    checkRules
+    pagerVerify,
+    paramsVerify
 }

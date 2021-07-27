@@ -1,5 +1,5 @@
 const ArticleModel = require('../modules/article')
-const { throwSuccess, throwError, checkRules } = require('../common/response')
+const { throwSuccess, throwError, pagerVerify, paramsVerify } = require('../common/response')
 
 class ArticleController {
     static async list(ctx) {
@@ -7,7 +7,7 @@ class ArticleController {
             const params = ctx.request.body
 
             // 参数规则检测
-            const errorResponse = checkRules.list(params)
+            const errorResponse = pagerVerify(params)
             if (errorResponse) {
                 throwError(ctx, 'rules', errorResponse)
                 return
@@ -28,7 +28,7 @@ class ArticleController {
             const params = ctx.request.body
 
             // 参数规则检测
-            const errorResponse = checkRules.inputs([
+            const errorResponse = paramsVerify([
                 {
                     msgLabel: '文章名',
                     value: params.articleName,
@@ -80,7 +80,7 @@ class ArticleController {
             const params = ctx.request.body
 
             // 参数规则检测
-            const errorResponse = checkRules.inputs([
+            const errorResponse = paramsVerify([
                 {
                     msgLabel: 'id',
                     value: params.id,
@@ -136,7 +136,7 @@ class ArticleController {
             const params = ctx.request.body
 
             // 参数规则检测
-            const errorResponse = checkRules.inputs([
+            const errorResponse = paramsVerify([
                 {
                     msgLabel: 'id',
                     value: params.id,

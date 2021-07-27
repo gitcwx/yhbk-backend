@@ -1,5 +1,5 @@
 const TagModel = require('../modules/tag')
-const { throwSuccess, throwError, checkRules } = require('../common/response')
+const { throwSuccess, throwError, pagerVerify, paramsVerify } = require('../common/response')
 
 class TagController {
     static async list(ctx) {
@@ -7,7 +7,7 @@ class TagController {
             const params = ctx.request.body
 
             // 参数规则检测
-            const errorResponse = checkRules.list(params)
+            const errorResponse = pagerVerify(params)
             if (errorResponse) {
                 throwError(ctx, 'rules', errorResponse)
                 return
@@ -29,7 +29,7 @@ class TagController {
             const params = ctx.request.body
 
             // 参数规则检测
-            const errorResponse = checkRules.inputs([
+            const errorResponse = paramsVerify([
                 {
                     msgLabel: '标签名',
                     value: params.tagName,
@@ -66,7 +66,7 @@ class TagController {
             const params = ctx.request.body
 
             // 参数规则检测
-            const errorResponse = checkRules.inputs([
+            const errorResponse = paramsVerify([
                 {
                     msgLabel: 'id',
                     value: params.id,
@@ -117,7 +117,7 @@ class TagController {
             const params = ctx.request.body
 
             // 参数规则检测
-            const errorResponse = checkRules.inputs([
+            const errorResponse = paramsVerify([
                 {
                     msgLabel: 'id',
                     value: params.id,

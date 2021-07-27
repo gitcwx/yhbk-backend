@@ -1,5 +1,5 @@
 const UserModel = require('../modules/user')
-const { throwSuccess, throwError, checkRules } = require('../common/response')
+const { throwSuccess, throwError, pagerVerify, paramsVerify } = require('../common/response')
 // 引入md5加密方法
 const { MD5 } = require('../../util/encrypt')
 // token
@@ -17,7 +17,7 @@ class UserController {
             const params = ctx.request.body
 
             // 参数规则检测
-            const errorResponse = checkRules.inputs([
+            const errorResponse = paramsVerify([
                 {
                     msgLabel: '用户名',
                     value: params.userName,
@@ -71,7 +71,7 @@ class UserController {
             const params = ctx.request.body
 
             // 参数规则检测
-            const errorResponse = checkRules.list(params)
+            const errorResponse = pagerVerify(params)
             if (errorResponse) {
                 throwError(ctx, 'rules', errorResponse)
                 return
@@ -94,7 +94,7 @@ class UserController {
             const params = ctx.request.body
 
             // 参数规则检测
-            const errorResponse = checkRules.inputs([
+            const errorResponse = paramsVerify([
                 {
                     msgLabel: '用户名',
                     value: params.userName,
@@ -151,7 +151,7 @@ class UserController {
             const params = ctx.request.body
 
             // 参数规则检测
-            const errorResponse = checkRules.inputs([
+            const errorResponse = paramsVerify([
                 {
                     msgLabel: 'id',
                     value: params.id,
@@ -205,7 +205,7 @@ class UserController {
             const params = ctx.request.body
 
             // 参数规则检测
-            const errorResponse = checkRules.inputs([
+            const errorResponse = paramsVerify([
                 {
                     msgLabel: 'id',
                     value: params.id,
@@ -256,7 +256,7 @@ class UserController {
             const params = ctx.request.body
 
             // 参数规则检测
-            const errorResponse = checkRules.inputs([
+            const errorResponse = paramsVerify([
                 {
                     msgLabel: 'id',
                     value: params.id,
