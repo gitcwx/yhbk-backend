@@ -14,7 +14,9 @@ class UserController {
     // 登录
     static async login(ctx) {
         try {
+            const headers = ctx.request.headers
             const params = ctx.request.body
+            const ip = headers['x-forwarded-for'] || headers['x-real-ip']
 
             // 参数规则检测
             const errorResponse = paramsVerify([
@@ -53,7 +55,7 @@ class UserController {
                 tokenKey,
                 { expiresIn: tokenExpiresTime }
             )
-            await UserModel.login(data)
+            await UserModel.login(data, ip)
             throwSuccess(ctx, {
                 msg: '登录成功',
                 data: {

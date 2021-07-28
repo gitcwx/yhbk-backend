@@ -1,4 +1,6 @@
 const ArticleModel = require('../modules/article')
+const categoryModal = require('../modules/category')
+const TagModal = require('../modules/tag')
 const { throwSuccess, throwError, pagerVerify, paramsVerify } = require('../common/response')
 
 class ArticleController {
@@ -30,14 +32,14 @@ class ArticleController {
             // 参数规则检测
             const errorResponse = paramsVerify([
                 {
-                    msgLabel: '文章名',
-                    value: params.articleName,
+                    msgLabel: '文章标题',
+                    value: params.title,
                     rules: { required: true, max: 50 }
                 },
                 {
                     msgLabel: '文章内容',
                     value: params.content,
-                    rules: { required: true, max: 50 }
+                    rules: { required: true, max: 5000 }
                 },
                 {
                     msgLabel: '文章分类',
@@ -46,7 +48,7 @@ class ArticleController {
                 },
                 {
                     msgLabel: '文章标签',
-                    value: params.tags,
+                    value: params.tagIds,
                     rules: { rules: /^\d{1,3}(,\d{1,3})*$/ } // 123,23,1 or null
                 }
             ])
@@ -57,11 +59,30 @@ class ArticleController {
 
             // 查询是否存在同名文章
             let data = await ArticleModel.findOne({
-                articleName: params.articleName
+                title: params.title
             })
             if (data) {
-                throwError(ctx, 'isExist', { msg: params.articleName + '已存在' })
+                throwError(ctx, 'isExist', { msg: params.title + '已存在' })
                 return
+            }
+
+            // 根据categoryId查询categoryName
+            data = await categoryModal.findOne({
+                id: params.categoryId
+            })
+            if (!data) {
+                throwError(ctx, 'notExist', { msg: '文章分类不合规' })
+                return
+            }
+            params.categoryName = data.categoryName
+
+            // 根据tagId查询tagName
+            if (params.tagIds) {
+                data = await TagModal.list({
+                    tagIds: params.tagIds
+                })
+
+                params.tagNames = data.rows.map(v => v.tagName).join(',')
             }
 
             // 执行写入
@@ -87,14 +108,14 @@ class ArticleController {
                     rules: { required: true }
                 },
                 {
-                    msgLabel: '文章名',
-                    value: params.articleName,
+                    msgLabel: '文章标题',
+                    value: params.title,
                     rules: { required: true, max: 50 }
                 },
                 {
                     msgLabel: '文章内容',
                     value: params.content,
-                    rules: { required: true, max: 50 }
+                    rules: { required: true, max: 5000 }
                 },
                 {
                     msgLabel: '文章分类',
@@ -103,7 +124,7 @@ class ArticleController {
                 },
                 {
                     msgLabel: '文章标签',
-                    value: params.tags,
+                    value: params.tagIds,
                     rules: { rules: /^\d{1,3}(,\d{1,3})*$/ } // 123,23,1 or null
                 }
             ])
@@ -113,12 +134,32 @@ class ArticleController {
             }
 
             // 查询是否存在
-            const data = await ArticleModel.findOne({
+            let data = await ArticleModel.findOne({
                 id: params.id
             })
             if (!data) {
                 throwError(ctx, 'notExist', { msg: '该数据不存在' })
                 return
+            }
+
+            // 根据categoryId查询categoryName
+            data = await categoryModal.findOne({
+                id: params.categoryId
+            })
+            if (!data) {
+                throwError(ctx, 'notExist', { msg: '文章分类不合规' })
+                return
+            }
+            params.categoryName = data.categoryName
+
+            // 根据tagId查询tagName
+            if (params.tagIds) {
+                data = await TagModal.list({
+                    tagIds: params.tagIds
+                })
+                params.tagNames = data.rows.map(v => v.tagName).join(',')
+            } else {
+                params.tagNames = ''
             }
 
             // 执行写入

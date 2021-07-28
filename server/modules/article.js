@@ -29,21 +29,21 @@ class ArticleModel {
 
         // 查找条件
         const conditions = {}
-        if (String(params.isEqual) === 'true' && params.articleName) {
+        if (String(params.isEqual) === 'true' && params.title) {
             // 名称精确查找
-            conditions.articleName = params.articleName
-        } else if (params.articleName) {
+            conditions.title = params.title
+        } else if (params.title) {
             // 名称包含查找
-            conditions.articleName = {
-                [Op.substring]: params.articleName
+            conditions.title = {
+                [Op.substring]: params.title
             }
         }
         if (params.categoryId) {
             conditions.categoryId = params.categoryId
         }
-        if (params.tags) {
-            conditions.tags = {
-                [Op.or]: params.tags.split(',')
+        if (params.tagIds) {
+            conditions.tagIds = {
+                [Op.or]: params.tagIds.split(',')
             }
         }
 
@@ -63,8 +63,8 @@ class ArticleModel {
         if (params.id) {
             conditions.id = params.id
         }
-        if (params.articleName) {
-            conditions.articleName = params.articleName
+        if (params.title) {
+            conditions.title = params.title
         }
 
         return await Article.findOne({
@@ -75,14 +75,24 @@ class ArticleModel {
     // 数据插入
     static async add(params) {
         return await Article.create({
-            articleName: params.articleName
+            title: params.title,
+            content: params.content,
+            categoryId: params.categoryId,
+            categoryName: params.categoryName,
+            tagIds: params.tagIds || '',
+            tagNames: params.tagNames
         })
     }
 
     // 数据编辑
     static async edit(params) {
         return await Article.update({
-            articleName: params.articleName
+            title: params.title,
+            content: params.content,
+            categoryId: params.categoryId,
+            categoryName: params.categoryName,
+            tagIds: params.tagIds || '',
+            tagNames: params.tagNames
         }, {
             where: {
                 id: params.id

@@ -1,16 +1,16 @@
 module.exports = function (sequelize, DataTypes) {
-    return sequelize.define('tag', {
+    return sequelize.define('category', {
         id: {
             type: DataTypes.UUID,
             primaryKey: true,
             allowNull: false,
             defaultValue: DataTypes.UUIDV4
         },
-        // 标签名称
-        tagName: {
+        // 分类名称
+        categoryName: {
             type: DataTypes.STRING,
             allowNull: false,
-            field: 'tagName'
+            field: 'categoryName'
         },
         // 创建时间
         createdAt: {

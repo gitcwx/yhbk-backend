@@ -70,10 +70,14 @@ class UserModel {
     }
 
     // 登录
-    static async login(params) {
-        return await User.update({
+    static async login(params, ip) {
+        const data = {
             lastLoginAt: new Date()
-        }, {
+        }
+        if (ip) {
+            data.ip = ip
+        }
+        return await User.update(data, {
             where: {
                 id: params.id
             }

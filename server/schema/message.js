@@ -1,16 +1,34 @@
 module.exports = function (sequelize, DataTypes) {
-    return sequelize.define('tag', {
+    return sequelize.define('message', {
         id: {
             type: DataTypes.UUID,
             primaryKey: true,
             allowNull: false,
             defaultValue: DataTypes.UUIDV4
         },
-        // 标签名称
-        tagName: {
+        // 留言内容
+        content: {
             type: DataTypes.STRING,
             allowNull: false,
-            field: 'tagName'
+            field: 'content'
+        },
+        // 留言人id
+        userId: {
+            type: DataTypes.STRING,
+            allowNull: true,
+            field: 'userId'
+        },
+        // 留言人名称
+        userName: {
+            type: DataTypes.STRING,
+            allowNull: true,
+            field: 'userName'
+        },
+        // 留言人名称
+        userIp: {
+            type: DataTypes.STRING,
+            allowNull: true,
+            field: 'userIp'
         },
         // 创建时间
         createdAt: {

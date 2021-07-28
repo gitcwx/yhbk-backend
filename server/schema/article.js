@@ -1,16 +1,16 @@
 module.exports = function (sequelize, DataTypes) {
     return sequelize.define('article', {
         id: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.UUID,
             primaryKey: true,
-            allowNull: true,
-            autoIncrement: true
+            allowNull: false,
+            defaultValue: DataTypes.UUIDV4
         },
-        // 文章名称
-        articleName: {
+        // 文章标题
+        title: {
             type: DataTypes.STRING,
             allowNull: false,
-            field: 'articleName'
+            field: 'title'
         },
         // 文章内容
         content: {
@@ -31,10 +31,16 @@ module.exports = function (sequelize, DataTypes) {
             field: 'categoryName'
         },
         // 文章标签
-        tags: {
+        tagIds: {
             type: DataTypes.STRING,
-            allowNull: false,
-            field: 'tags'
+            allowNull: true,
+            field: 'tagIds'
+        },
+        // 文章标签名称
+        tagNames: {
+            type: DataTypes.STRING,
+            allowNull: true,
+            field: 'tagNames'
         },
         // 创建时间
         createdAt: {

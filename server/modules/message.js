@@ -6,18 +6,18 @@ const Sequelize = require('sequelize')
 const Op = Sequelize.Op
 
 // 引入数据表模型
-const Tag = db.sequelize.import('../schema/tag')
+const Message = db.sequelize.import('../schema/message')
 
 // 引入默认数据
-const defaultData = require('../defaults/tag')
+const defaultData = require('../defaults/message')
 
 // 自动创建表 `force: true` 表存在时先删除表
-Tag.sync({ force: true }).then(() => {
+Message.sync({ force: true }).then(() => {
     // 默认数据写入表
-    return Tag.bulkCreate(defaultData)
+    return Message.bulkCreate(defaultData)
 })
 
-class TagModel {
+class MessageModel {
     // 查询列表
     static async list(params) {
         // 分页相关参数
@@ -30,23 +30,17 @@ class TagModel {
         // 查找条件
         const conditions = {}
         // 查找条件
-        if (String(params.isEqual) === 'true' && params.tagName) {
+        if (String(params.isEqual) === 'true' && params.content) {
             // 名称精确查找
-            conditions.tagName = params.tagName
-        } else if (params.tagName) {
+            conditions.content = params.content
+        } else if (params.content) {
             // 名称包含查找
-            conditions.tagName = {
-                [Op.substring]: params.tagName
+            conditions.content = {
+                [Op.substring]: params.content
             }
         }
 
-        if (params.tagIds) {
-            conditions.id = {
-                [Op.or]: params.tagIds.split(',')
-            }
-        }
-
-        return await Tag.findAndCountAll({
+        return await Message.findAndCountAll({
             limit: pager.limit,
             offset: (pager.page - 1) * pager.limit,
             where: conditions,
@@ -62,26 +56,26 @@ class TagModel {
         if (params.id) {
             conditions.id = params.id
         }
-        if (params.tagName) {
-            conditions.tagName = params.tagName
+        if (params.content) {
+            conditions.content = params.content
         }
 
-        return await Tag.findOne({
+        return await Message.findOne({
             where: conditions
         })
     }
 
     // 数据插入
     static async add(params) {
-        return await Tag.create({
-            tagName: params.tagName
+        return await Message.create({
+            content: params.content
         })
     }
 
     // 数据编辑
     static async edit(params) {
-        return await Tag.update({
-            tagName: params.tagName
+        return await Message.update({
+            content: params.content
         }, {
             where: {
                 id: params.id
@@ -91,7 +85,7 @@ class TagModel {
 
     // 数据删除
     static async del(params) {
-        return await Tag.destroy({
+        return await Message.destroy({
             where: {
                 id: params.id
             }
@@ -99,4 +93,4 @@ class TagModel {
     }
 }
 
-module.exports = TagModel
+module.exports = MessageModel
