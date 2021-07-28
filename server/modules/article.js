@@ -85,18 +85,29 @@ class ArticleModel {
     }
 
     // 数据编辑
-    static async edit(params) {
-        return await Article.update({
-            title: params.title,
-            content: params.content,
-            categoryId: params.categoryId,
-            categoryName: params.categoryName,
-            tagIds: params.tagIds || '',
-            tagNames: params.tagNames
-        }, {
-            where: {
-                id: params.id
-            }
+    static async edit(conditions, params) {
+        const data = {}
+        if (params.title !== undefined) {
+            data.title = params.title
+        }
+        if (params.content !== undefined) {
+            data.content = params.content
+        }
+        if (params.categoryId !== undefined) {
+            data.categoryId = params.categoryId
+        }
+        if (params.categoryName !== undefined) {
+            data.categoryName = params.categoryName
+        }
+        if (params.tagIds !== undefined) {
+            data.tagIds = params.tagIds
+        }
+        if (params.tagNames !== undefined) {
+            data.tagNames = params.tagNames
+        }
+
+        return await Article.update(data, {
+            where: conditions
         })
     }
 

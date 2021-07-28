@@ -1,4 +1,5 @@
 const TagModel = require('../modules/tag')
+// const ArticleModel = require('../modules/article')
 const { throwSuccess, throwError, pagerVerify, paramsVerify } = require('../common/response')
 
 class TagController {
@@ -102,7 +103,7 @@ class TagController {
             }
 
             // 执行写入
-            await TagModel.edit(params)
+            await TagModel.edit({ id: params.id }, params)
             throwSuccess(ctx, {
                 msg: '修改成功',
                 data: null

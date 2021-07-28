@@ -1,4 +1,5 @@
 const CategoryModel = require('../modules/category')
+const ArticleModel = require('../modules/article')
 const { throwSuccess, throwError, pagerVerify, paramsVerify } = require('../common/response')
 
 class CategoryController {
@@ -102,10 +103,15 @@ class CategoryController {
             }
 
             // 执行写入
-            await CategoryModel.edit(params)
+            await CategoryModel.edit({ id: params.id }, params)
+            // 更新文章
+            await ArticleModel.edit({
+                categoryId: params.id
+            }, {
+                categoryName: params.categoryName
+            })
             throwSuccess(ctx, {
-                msg: '修改成功',
-                data: null
+                msg: '修改成功'
             })
         } catch (err) {
             throwError(ctx, 500)
@@ -140,6 +146,13 @@ class CategoryController {
 
             // 执行写入
             await CategoryModel.del(params)
+            // 更新文章
+            await ArticleModel.edit({
+                categoryId: params.id
+            }, {
+                categoryName: '',
+                categoryId: ''
+            })
             throwSuccess(ctx, {
                 msg: '删除成功'
             })

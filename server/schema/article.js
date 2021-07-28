@@ -21,13 +21,13 @@ module.exports = function (sequelize, DataTypes) {
         // 文章分类
         categoryId: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
             field: 'categoryId'
         },
         // 文章分类名称
         categoryName: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
             field: 'categoryName'
         },
         // 文章标签

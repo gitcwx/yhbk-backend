@@ -79,13 +79,13 @@ class TagModel {
     }
 
     // 数据编辑
-    static async edit(params) {
-        return await Tag.update({
-            tagName: params.tagName
-        }, {
-            where: {
-                id: params.id
-            }
+    static async edit(condition, params) {
+        const data = {}
+        if (params.tagName) {
+            data.tagName = params.tagName
+        }
+        return await Tag.update(data, {
+            where: condition
         })
     }
 

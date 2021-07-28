@@ -163,7 +163,7 @@ class ArticleController {
             }
 
             // 执行写入
-            await ArticleModel.edit(params)
+            await ArticleModel.edit({ id: params.id }, params)
             throwSuccess(ctx, {
                 msg: '修改成功'
             })
