@@ -85,8 +85,7 @@ class MessageController {
             // 执行写入
             await MessageModel.edit(params)
             throwSuccess(ctx, {
-                msg: '修改成功',
-                data: null
+                msg: '修改成功'
             })
         } catch (err) {
             throwError(ctx, 500)

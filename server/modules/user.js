@@ -10,6 +10,9 @@ const { UUID, MD5 } = require('../../util/encrypt')
 
 // 引入数据表模型
 const User = db.sequelize.import('../schema/user')
+// const Message = db.sequelize.import('../schema/message')
+// User.hasMany(Message)
+// Message.belongsTo(User)
 
 // 引入默认数据
 const defaultData = require('../defaults/user')
@@ -25,7 +28,6 @@ class UserModel {
     static async list(params) {
         // 分页相关参数
         const pager = {}
-        // 常驻参数
         pager.page = Number(params.page || 1)
         pager.limit = Number(params.limit || 10)
         pager.orderby = params.orderby || 'desc'

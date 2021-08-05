@@ -7,7 +7,9 @@ const Op = Sequelize.Op
 
 // 引入数据表模型
 const Message = db.sequelize.import('../schema/message')
-
+// const User = db.sequelize.import('../schema/user')
+// User.hasMany(Message)
+// Message.belongsTo(User)
 // 引入默认数据
 const defaultData = require('../defaults/message')
 

@@ -1,3 +1,4 @@
+const { gzipSync, gunzipSync } = require('zlib')
 module.exports = function (sequelize, DataTypes) {
     return sequelize.define('article', {
         id: {
@@ -10,13 +11,25 @@ module.exports = function (sequelize, DataTypes) {
         title: {
             type: DataTypes.STRING,
             allowNull: false,
+            unique: true,
             field: 'title'
         },
         // 文章内容
         content: {
-            type: DataTypes.STRING,
+            type: DataTypes.TEXT,
             allowNull: false,
-            field: 'content'
+            field: 'content',
+            // 内容压缩
+            get() {
+                const storedValue = this.getDataValue('content')
+                const gzippedBuffer = Buffer.from(storedValue, 'base64')
+                const unzippedBuffer = gunzipSync(gzippedBuffer)
+                return unzippedBuffer.toString()
+            },
+            set(value) {
+                const gzippedBuffer = gzipSync(value)
+                this.setDataValue('content', gzippedBuffer.toString('base64'))
+            }
         },
         // 文章分类
         categoryId: {
@@ -51,11 +64,9 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.DATE
         }
     }, {
-        /**
-         * 如果为true，则表示名称和model相同，即user
-         * 如果为fasle，mysql创建的表名称会是复数，即users
-         * 如果指定的表名称本身就是复数，则形式不变
-         */
+        // 软删除
+        paranoid: true,
+        // 表名与modal名相同
         freezeTableName: true
     })
 }

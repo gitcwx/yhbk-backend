@@ -66,7 +66,6 @@ class ArticleModel {
         if (params.title) {
             conditions.title = params.title
         }
-
         return await Article.findOne({
             where: conditions
         })
@@ -105,7 +104,6 @@ class ArticleModel {
         if (params.tagNames !== undefined) {
             data.tagNames = params.tagNames
         }
-
         return await Article.update(data, {
             where: conditions
         })
