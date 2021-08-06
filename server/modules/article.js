@@ -1,12 +1,12 @@
-// 引入mysql的配置文件
-const db = require('../../config/db')
-
-// 引入sequelize对象
-const Sequelize = require('sequelize')
-const Op = Sequelize.Op
-
-// 引入数据表模型
-const Article = db.sequelize.import('../schema/article')
+const {
+    article: Article
+    // tag: Tag,
+    // category: Category,
+    // comment: Comment,
+    // user: User,
+    // reply: Reply
+    // sequelize
+} = require('../schema')
 
 // 引入默认数据
 const defaultData = require('../defaults/article')
@@ -20,54 +20,77 @@ Article.sync({ force: true }).then(() => {
 class ArticleModel {
     // 查询列表
     static async list(params) {
-        // 分页相关参数
-        const pager = {}
-        pager.page = Number(params.page || 1)
-        pager.limit = Number(params.limit || 10)
-        pager.orderby = params.orderby || 'desc'
-        pager.orderName = params.orderName || 'updatedAt'
+        const page = Number(params.page || 1)
+        const limit = Number(params.limit || 10)
+        const orderby = params.orderby || 'desc'
+        const orderName = params.orderName || 'updatedAt'
+        const keyword = params.keyword || ''
 
         // 查找条件
-        const conditions = {}
-        if (String(params.isEqual) === 'true' && params.title) {
-            // 名称精确查找
-            conditions.title = params.title
-        } else if (params.title) {
-            // 名称包含查找
-            conditions.title = {
-                [Op.substring]: params.title
-            }
-        }
-        if (params.categoryId) {
-            conditions.categoryId = params.categoryId
-        }
-        if (params.tagIds) {
-            conditions.tagIds = {
-                [Op.or]: params.tagIds.split(',')
-            }
-        }
+        // const userFilter = params.userId ? { id: params.userId } : {}
+        // const tagFilter = params.tagIds ? { id: { $or: params.tagIds.split(',') } } : {}
+        // const categoryFilter = params.categoryId ? { id: params.categoryId } : {}
 
         return await Article.findAll({
-            limit: pager.limit,
-            offset: (pager.page - 1) * pager.limit,
-            where: conditions,
+            limit: Number(limit),
+            offset: (page - 1) * limit,
+            where: {
+                $or: {
+                    title: {
+                        $like: `%${keyword}%`
+                    }
+                    // content已经转base64 暂时无法查找
+                    // content: {
+                    //     $like: `%${keyword}%`
+                    // }
+                }
+            },
             order: [
-                [pager.orderName, pager.orderby]
+                [orderName, orderby]
             ]
+            // include: [
+            //     { model: Tag, attributes: ['name'], where: tagFilter },
+            //     { model: Category, attributes: ['name'], where: categoryFilter },
+            //     { model: User, attributes: ['username'], where: userFilter },
+            //     {
+            //         model: Comment,
+            //         attributes: ['id'],
+            //         include: [{ model: Reply, attributes: ['id'] }]
+            //     }
+            // ]
         })
     }
 
-    // 单项查找
-    static async findOne(params) {
-        const conditions = {}
-        if (params.id) {
-            conditions.id = params.id
-        }
-        if (params.title) {
-            conditions.title = params.title
-        }
+    // 文章详情
+    static async detail(id) {
         return await Article.findOne({
-            where: conditions
+            where: {
+                id
+            },
+            include: [
+                // { model: Tag, attributes: ['name'] },
+                // { model: Category, attributes: ['name'] },
+                // {
+                //     model: Comment,
+                //     attributes: ['id', 'content', 'createdAt'],
+                //     include: [
+                //         {
+                //             model: Reply,
+                //             attributes: ['id', 'content', 'createdAt'],
+                //             include: [{ model: User, as: 'user', attributes: { exclude: ['salt', 'password'] } }]
+                //         },
+                //         { model: User, as: 'user', attributes: { exclude: ['salt', 'password'] } }
+                //     ],
+                //     row: true
+                // }
+            ],
+            order: [ // comment model order
+                // [Comment, 'createdAt', 'DESC'],
+                // [
+                //     [Comment, Reply, 'createdAt', 'ASC']
+                // ]
+            ],
+            row: true
         })
     }
 
@@ -76,45 +99,66 @@ class ArticleModel {
         return await Article.create({
             title: params.title,
             content: params.content,
+            authorId: params.authorId,
             categoryId: params.categoryId,
-            categoryName: params.categoryName,
             tagIds: params.tagIds || '',
-            tagNames: params.tagNames
+            isTop: params.isTop === 'true'
+        }, {
+            // include: [Tag, Category]
         })
     }
 
     // 数据编辑
-    static async edit(conditions, params) {
-        const data = {}
+    static async edit(params, articleId) {
+        const newData = {}
         if (params.title !== undefined) {
-            data.title = params.title
+            newData.title = params.title
         }
         if (params.content !== undefined) {
-            data.content = params.content
+            newData.content = params.content
         }
-        if (params.categoryId !== undefined) {
-            data.categoryId = params.categoryId
+        if (params.isTop !== undefined) {
+            newData.isTop = params.isTop === 'true'
         }
-        if (params.categoryName !== undefined) {
-            data.categoryName = params.categoryName
-        }
-        if (params.tagIds !== undefined) {
-            data.tagIds = params.tagIds
-        }
-        if (params.tagNames !== undefined) {
-            data.tagNames = params.tagNames
-        }
-        return await Article.update(data, {
-            where: conditions
+        await Article.update(newData, {
+            where: {
+                id: articleId
+            }
         })
+
+        // if (params.categoryId !== undefined) {
+        //     await Tag.destroy({ where: { articleId } })
+        //     await Tag.bulkCreate([{ id: params.categoryId, articleId }])
+        // }
+
+        // if (params.tagIds !== undefined) {
+        //     const tagList = params.tagIds.split(',').map(id => ({ id, articleId }))
+        //     await Tag.destroy({ where: { articleId } })
+        //     await Tag.bulkCreate(tagList)
+        // }
     }
 
     // 数据删除
-    static async del(params) {
+    static async del(id) {
         return await Article.destroy({
             where: {
-                id: params.id
+                id
             }
+        })
+    }
+
+    // 查询数据是否存在
+    static async isExist(params) {
+        const conditions = {}
+        if (params.id) {
+            conditions.id = params.id
+        }
+        if (params.title) {
+            conditions.title = params.title
+        }
+
+        return await Article.findOne({
+            where: conditions
         })
     }
 }

@@ -1,16 +1,15 @@
 const moment = require('moment')
 module.exports = function (sequelize, DataTypes) {
-    const Tag = sequelize.define('tag', {
+    const Reply = sequelize.define('reply', {
         id: {
             type: DataTypes.UUID,
             primaryKey: true,
             allowNull: false,
             defaultValue: DataTypes.UUIDV4
         },
-        // 标签名称
-        name: {
+        // 内容
+        content: {
             type: DataTypes.STRING,
-            unique: true,
             allowNull: false
         },
         // 创建时间
@@ -36,14 +35,13 @@ module.exports = function (sequelize, DataTypes) {
         freezeTableName: true
     })
 
-    Tag.associate = models => {
-        // Tag.belongsTo(models.article, {
-        //     as: 'article',
-        //     foreignKey: 'articleId',
+    Reply.associate = models => {
+        // Reply.belongsTo(models.user, {
+        //     foreignKey: 'userId',
         //     targetKey: 'id',
         //     constraints: false
         // })
     }
 
-    return Tag
+    return Reply
 }

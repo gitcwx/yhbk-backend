@@ -32,7 +32,7 @@ class CategoryController {
             const errorResponse = paramsVerify([
                 {
                     msgLabel: '分类名',
-                    value: params.categoryName,
+                    value: params.name,
                     rules: { required: true, max: 10 }
                 }
             ])
@@ -42,11 +42,11 @@ class CategoryController {
             }
 
             // 查询是否存在同名分类
-            let data = await CategoryModel.findOne({
-                categoryName: params.categoryName
+            let data = await CategoryModel.isExist({
+                name: params.name
             })
             if (data) {
-                throwError(ctx, 'isExist', { msg: params.categoryName + '已存在' })
+                throwError(ctx, 'isExist', { msg: params.name + '已存在' })
                 return
             }
 
@@ -74,7 +74,7 @@ class CategoryController {
                 },
                 {
                     msgLabel: '分类名',
-                    value: params.categoryName,
+                    value: params.name,
                     rules: { required: true, max: 10 }
                 }
             ])
@@ -84,16 +84,16 @@ class CategoryController {
             }
 
             // 查询是否存在同名
-            let data = await CategoryModel.findOne({
-                categoryName: params.categoryName
+            let data = await CategoryModel.isExist({
+                name: params.name
             })
             if (data) {
-                throwError(ctx, 'isExist', { msg: params.categoryName + '已存在' })
+                throwError(ctx, 'isExist', { msg: params.name + '已存在' })
                 return
             }
 
             // 查询是否存在
-            data = await CategoryModel.findOne({
+            data = await CategoryModel.isExist({
                 id: params.id
             })
             if (!data) {
@@ -102,7 +102,7 @@ class CategoryController {
             }
 
             // 执行写入
-            await CategoryModel.edit({ id: params.id }, params)
+            await CategoryModel.edit(params, params.id)
             throwSuccess(ctx, {
                 msg: '修改成功'
             })
@@ -129,7 +129,7 @@ class CategoryController {
             }
 
             // 查询是否存在
-            const data = await CategoryModel.findOne({
+            const data = await CategoryModel.isExist({
                 id: params.id
             })
             if (!data) {
@@ -138,7 +138,7 @@ class CategoryController {
             }
 
             // 执行写入
-            await CategoryModel.del(params)
+            await CategoryModel.del(params.id)
             throwSuccess(ctx, {
                 msg: '删除成功'
             })

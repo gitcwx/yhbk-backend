@@ -10,7 +10,7 @@ const fs = require('fs')
 const path = require('path')
 // jwt token验证
 const koaJwt = require('koa-jwt')
-const { tokenKey } = require('./config/token')
+const { token } = require('./config')
 const { throwError } = require('./server/common/response')
 
 // error handler
@@ -32,7 +32,7 @@ app.use(async (ctx, next) => {
 // token验证拦截
 app.use(
     koaJwt({
-        secret: tokenKey
+        secret: token.key
     }).unless({
         path: [/login/, '/api/user/register']
     })

@@ -24,6 +24,7 @@
     "koa-unless": "^1.0.7",
     "koa-views": "^6.2.0",
     "koa2-cors": "^2.0.6",
+    "moment": "^2.29.1",
     "mysql": "^2.18.1",
     "mysql2": "^2.2.5",
     "node-uuid": "^1.4.8",

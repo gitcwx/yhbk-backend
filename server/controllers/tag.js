@@ -33,7 +33,7 @@ class TagController {
             const errorResponse = paramsVerify([
                 {
                     msgLabel: '标签名',
-                    value: params.tagName,
+                    value: params.name,
                     rules: { required: true, max: 10 }
                 }
             ])
@@ -43,11 +43,11 @@ class TagController {
             }
 
             // 查询是否存在同名标签
-            let data = await TagModel.findOne({
-                tagName: params.tagName
+            let data = await TagModel.isExist({
+                name: params.name
             })
             if (data) {
-                throwError(ctx, 'isExist', { msg: params.tagName + '已存在' })
+                throwError(ctx, 'isExist', { msg: params.name + '已存在' })
                 return
             }
 
@@ -75,7 +75,7 @@ class TagController {
                 },
                 {
                     msgLabel: '标签名',
-                    value: params.tagName,
+                    value: params.name,
                     rules: { required: true, max: 10 }
                 }
             ])
@@ -85,16 +85,16 @@ class TagController {
             }
 
             // 查询是否存在同名
-            let data = await TagModel.findOne({
-                tagName: params.tagName
+            let data = await TagModel.isExist({
+                name: params.name
             })
             if (data) {
-                throwError(ctx, 'isExist', { msg: params.tagName + '已存在' })
+                throwError(ctx, 'isExist', { msg: params.name + '已存在' })
                 return
             }
 
             // 查询是否存在
-            data = await TagModel.findOne({
+            data = await TagModel.isExist({
                 id: params.id
             })
             if (!data) {
@@ -103,10 +103,9 @@ class TagController {
             }
 
             // 执行写入
-            await TagModel.edit({ id: params.id }, params)
+            await TagModel.edit(params, params.id)
             throwSuccess(ctx, {
-                msg: '修改成功',
-                data: null
+                msg: '修改成功'
             })
         } catch (err) {
             throwError(ctx, 500)
@@ -131,7 +130,7 @@ class TagController {
             }
 
             // 查询是否存在
-            const data = await TagModel.findOne({
+            const data = await TagModel.isExist({
                 id: params.id
             })
             if (!data) {
@@ -140,7 +139,7 @@ class TagController {
             }
 
             // 执行写入
-            await TagModel.del(params)
+            await TagModel.del(params.id)
             throwSuccess(ctx, {
                 msg: '删除成功'
             })

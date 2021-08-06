@@ -4,7 +4,7 @@ const { throwSuccess, throwError, pagerVerify, paramsVerify } = require('../comm
 const { MD5 } = require('../../util/encrypt')
 // token
 const jwt = require('jsonwebtoken')
-const { tokenKey, tokenExpiresTime } = require('../../config/token')
+const { token } = require('../../config')
 class UserController {
     // 注册
     static async register(ctx, next) {
@@ -22,7 +22,7 @@ class UserController {
             const errorResponse = paramsVerify([
                 {
                     msgLabel: '用户名',
-                    value: params.userName,
+                    value: params.username,
                     rules: { required: true }
                 },
                 {
@@ -35,31 +35,30 @@ class UserController {
                 throwError(ctx, 'rules', errorResponse)
                 return
             }
-
             // 查询用户是否存在
-            const data = await UserModel.findOne({
-                userName: params.userName
+            const data = await UserModel.isExist({
+                username: params.username
             })
             if (!data) {
                 throwError(ctx, 'notExist', { msg: '用户名或者密码错误' })
                 return
             }
-
             const password = await MD5(params.password, data.salt)
             if (data.password !== password) {
                 throwError(ctx, 'notMatch', { msg: '用户名或者密码错误' })
                 return
             }
-            const token = jwt.sign(
-                { userName: data.userName, password: data.password, salt: data.salt },
-                tokenKey,
-                { expiresIn: tokenExpiresTime }
+
+            const tokenValue = jwt.sign(
+                { username: data.username, password: data.password, salt: data.salt },
+                token.key,
+                { expiresIn: token.expire }
             )
             await UserModel.login(data, ip)
             throwSuccess(ctx, {
                 msg: '登录成功',
                 data: {
-                    token
+                    tokenValue
                 }
             })
         } catch (err) {
@@ -99,7 +98,7 @@ class UserController {
             const errorResponse = paramsVerify([
                 {
                     msgLabel: '用户名',
-                    value: params.userName,
+                    value: params.username,
                     rules: { required: true, reg: /^[\u4e00-\u9fa5a-zA-Z0-9_]{4,16}$/ }
                 },
                 {
@@ -114,8 +113,8 @@ class UserController {
             }
 
             // 查询用户名是否存在
-            let data = await UserModel.findOne({
-                userName: params.userName
+            let data = await UserModel.isExist({
+                username: params.username
             })
             if (data) {
                 throwError(ctx, 'isExist', { msg: '用户名已存在' })
@@ -125,15 +124,15 @@ class UserController {
             // 执行写入
             data = await UserModel.add(params)
             if (isRegister) {
-                const token = jwt.sign(
-                    { userName: data.userName, password: data.password, salt: data.salt },
-                    tokenKey,
-                    { expiresIn: tokenExpiresTime }
+                const tokenValue = jwt.sign(
+                    { username: data.username, password: data.password, salt: data.salt },
+                    token.key,
+                    { expiresIn: token.expire }
                 )
                 throwSuccess(ctx, {
                     msg: '注册成功',
                     data: {
-                        token
+                        tokenValue
                     }
                 })
             } else {
@@ -176,7 +175,7 @@ class UserController {
             }
 
             // 查询是否存在
-            const data = await UserModel.findOne({
+            const data = await UserModel.isExist({
                 id: params.id
             })
             if (!data) {
@@ -215,7 +214,7 @@ class UserController {
                 },
                 {
                     msgLabel: '用户名',
-                    value: params.userName,
+                    value: params.username,
                     rules: { required: true, reg: /^[\u4e00-\u9fa5a-zA-Z0-9_]{4,16}$/ }
                 }
             ])
@@ -225,7 +224,7 @@ class UserController {
             }
 
             // 查询是否存在
-            let data = await UserModel.findOne({
+            let data = await UserModel.isExist({
                 id: params.id
             })
             if (!data) {
@@ -234,8 +233,8 @@ class UserController {
             }
 
             // 查询是否存在同名
-            data = await UserModel.findOne({
-                userName: params.userName
+            data = await UserModel.isExist({
+                username: params.username
             })
             if (data) {
                 throwError(ctx, 'isExist', { msg: '用户名已存在' })
@@ -243,7 +242,7 @@ class UserController {
             }
 
             // 执行写入
-            await UserModel.info(params)
+            await UserModel.info(params, params.id)
             throwSuccess(ctx, {
                 msg: '修改成功'
             })
@@ -271,7 +270,7 @@ class UserController {
             }
 
             // 查询是否存在
-            const data = await UserModel.findOne({
+            const data = await UserModel.isExist({
                 id: params.id
             })
             if (!data) {
@@ -280,7 +279,7 @@ class UserController {
             }
 
             // 执行写入
-            await UserModel.del(params)
+            await UserModel.del(params.id)
             throwSuccess(ctx, {
                 msg: '删除成功'
             })
