@@ -24,7 +24,7 @@ class UserModel {
         const keyword = params.keyword || ''
 
         return await User.findAndCountAll({
-            attributes: { exclude: ['salt', 'password'] },
+            attributes: { exclude: ['salt', 'password', 'ip'] },
             limit,
             offset: (page - 1) * limit,
             where: {

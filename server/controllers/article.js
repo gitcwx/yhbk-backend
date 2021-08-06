@@ -117,16 +117,16 @@ class ArticleController {
             }
 
             // tagId是否存在
-            if (params.tagIds) {
-                data = await TagModal.list({
-                    id: params.tagIds
-                })
+            // if (params.tagIds) {
+            //     data = await TagModal.list({
+            //         id: params.tagIds
+            //     })
 
-                if (!data) {
-                    throwError(ctx, 'notExist', { msg: '标签分类不合规' })
-                    return
-                }
-            }
+            //     if (!data) {
+            //         throwError(ctx, 'notExist', { msg: '标签分类不合规' })
+            //         return
+            //     }
+            // }
 
             // 执行写入
             data = await ArticleModel.add(params)

@@ -64,8 +64,8 @@ module.exports = function (sequelize, DataTypes) {
     })
 
     Article.associate = models => {
-        // Article.hasMany(models.tag)
-        // Article.hasOne(models.category)
+        Article.hasMany(models.tag)
+        Article.hasOne(models.category)
         // Article.hasMany(models.comment)
         // Article.hasMany(models.reply)
 

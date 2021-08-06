@@ -37,12 +37,12 @@ module.exports = function (sequelize, DataTypes) {
     })
 
     Category.associate = models => {
-        // Category.belongsTo(models.article, {
-        //     as: 'article',
-        //     foreignKey: 'articleId',
-        //     targetKey: 'id',
-        //     constraints: false
-        // })
+        Category.belongsTo(models.article, {
+            as: 'article',
+            foreignKey: 'articleId',
+            targetKey: 'id',
+            constraints: false
+        })
     }
 
     return Category

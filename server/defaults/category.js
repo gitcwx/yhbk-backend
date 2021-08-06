@@ -1,20 +1,18 @@
 module.exports = [
     {
-        id: '96cdd48d-f608-44be-b1dc-47ac3b5d4009',
-        name: '前端积累',
-        createdAt: '2021-07-28T06:59:30.000Z',
-        updatedAt: '2021-07-28T06:59:30.000Z'
+        createdAt: '2021-08-06 14:49:27',
+        updatedAt: '2021-08-06 14:49:27',
+        id: 'e234ee48-83c7-4b85-9e57-6a9b4bd8e00c',
+        name: '前端',
+        deletedAt: null,
+        articleId: null
     },
     {
-        id: 'ff7d5a54-9426-43d1-9b5d-5a7d045665a8',
-        name: '后端摸索',
-        createdAt: '2021-07-28T06:59:30.000Z',
-        updatedAt: '2021-07-28T06:59:30.000Z'
-    },
-    {
-        id: 'f736a7f9-d80b-43d0-9694-9a94c6ac75a7',
-        name: '杂文笔记',
-        createdAt: '2021-07-28T06:59:30.000Z',
-        updatedAt: '2021-07-28T06:59:30.000Z'
+        createdAt: '2021-08-06 14:49:33',
+        updatedAt: '2021-08-06 14:49:33',
+        id: 'fbd1a4c9-de9f-4bad-b1c7-458469f780b3',
+        name: '后端',
+        deletedAt: null,
+        articleId: null
     }
 ]

@@ -1,7 +1,7 @@
 const {
-    article: Article
-    // tag: Tag,
-    // category: Category,
+    article: Article,
+    tag: Tag,
+    category: Category
     // comment: Comment,
     // user: User,
     // reply: Reply
@@ -27,10 +27,10 @@ class ArticleModel {
         const keyword = params.keyword || ''
 
         // 查找条件
-        // const userFilter = params.userId ? { id: params.userId } : {}
-        // const tagFilter = params.tagIds ? { id: { $or: params.tagIds.split(',') } } : {}
-        // const categoryFilter = params.categoryId ? { id: params.categoryId } : {}
-
+        // const userFilter = params.userId ? { id: params.userId } : null
+        const tagFilter = params.tagIds ? { id: { $or: params.tagIds.split(',') } } : null
+        const categoryFilter = params.categoryId ? { id: params.categoryId } : null
+        console.log(categoryFilter)
         return await Article.findAll({
             limit: Number(limit),
             offset: (page - 1) * limit,
@@ -47,17 +47,17 @@ class ArticleModel {
             },
             order: [
                 [orderName, orderby]
+            ],
+            include: [
+                { model: Tag, attributes: ['name'], where: tagFilter },
+                { model: Category, attributes: ['name'], where: categoryFilter }
+                // { model: User, attributes: ['username'], where: userFilter },
+                // {
+                //     model: Comment,
+                //     attributes: ['id'],
+                //     include: [{ model: Reply, attributes: ['id'] }]
+                // }
             ]
-            // include: [
-            //     { model: Tag, attributes: ['name'], where: tagFilter },
-            //     { model: Category, attributes: ['name'], where: categoryFilter },
-            //     { model: User, attributes: ['username'], where: userFilter },
-            //     {
-            //         model: Comment,
-            //         attributes: ['id'],
-            //         include: [{ model: Reply, attributes: ['id'] }]
-            //     }
-            // ]
         })
     }
 
@@ -68,8 +68,8 @@ class ArticleModel {
                 id
             },
             include: [
-                // { model: Tag, attributes: ['name'] },
-                // { model: Category, attributes: ['name'] },
+                { model: Tag, attributes: ['name'] },
+                { model: Category, attributes: ['name'] }
                 // {
                 //     model: Comment,
                 //     attributes: ['id', 'content', 'createdAt'],
@@ -96,15 +96,16 @@ class ArticleModel {
 
     // 数据插入
     static async add(params) {
+        const tags = params.tagIds ? params.tagIds.split(',').map(v => ({ name: v })) : []
         return await Article.create({
             title: params.title,
             content: params.content,
             authorId: params.authorId,
-            categoryId: params.categoryId,
-            tagIds: params.tagIds || '',
+            category: { name: params.categoryId },
+            tags,
             isTop: params.isTop === 'true'
         }, {
-            // include: [Tag, Category]
+            include: [Tag, Category]
         })
     }
 
@@ -126,16 +127,16 @@ class ArticleModel {
             }
         })
 
-        // if (params.categoryId !== undefined) {
-        //     await Tag.destroy({ where: { articleId } })
-        //     await Tag.bulkCreate([{ id: params.categoryId, articleId }])
-        // }
+        if (params.categoryId !== undefined) {
+            await Tag.destroy({ where: { articleId } })
+            await Tag.bulkCreate([{ id: params.categoryId, articleId }])
+        }
 
-        // if (params.tagIds !== undefined) {
-        //     const tagList = params.tagIds.split(',').map(id => ({ id, articleId }))
-        //     await Tag.destroy({ where: { articleId } })
-        //     await Tag.bulkCreate(tagList)
-        // }
+        if (params.tagIds !== undefined) {
+            const tagList = params.tagIds.split(',').map(id => ({ id, articleId }))
+            await Tag.destroy({ where: { articleId } })
+            await Tag.bulkCreate(tagList)
+        }
     }
 
     // 数据删除
