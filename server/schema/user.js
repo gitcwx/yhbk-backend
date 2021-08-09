@@ -2,49 +2,50 @@ const moment = require('moment')
 module.exports = function (sequelize, DataTypes) {
     const User = sequelize.define('user', {
         id: {
+            comment: '主键ID',
             type: DataTypes.UUID,
             primaryKey: true,
             allowNull: false,
             defaultValue: DataTypes.UUIDV4
         },
-        // 用户名
         username: {
+            comment: '用户名',
             type: DataTypes.STRING,
             allowNull: false
         },
-        // 密码
         password: {
+            comment: '密码',
             type: DataTypes.STRING,
             allowNull: false
         },
-        // 盐
         salt: {
+            comment: '盐',
             type: DataTypes.STRING,
             allowNull: false
         },
-        // 用户ip
         ip: {
+            comment: '用户ip',
             type: DataTypes.STRING,
             allowNull: true
         },
-        // 上次登录时间
         lastLoginAt: {
+            comment: '上次登录时间',
             type: DataTypes.DATE,
             allowNull: true,
             get() {
                 return moment(this.getDataValue('lastLoginAt')).format('YYYY-MM-DD HH:mm:ss')
             }
         },
-        // 创建时间
         createdAt: {
+            comment: '创建时间',
             type: DataTypes.DATE,
             defaultValue: DataTypes.NOW,
             get() {
                 return moment(this.getDataValue('createdAt')).format('YYYY-MM-DD HH:mm:ss')
             }
         },
-        // 更新时间
         updatedAt: {
+            comment: '更新时间',
             type: DataTypes.DATE,
             defaultValue: DataTypes.NOW,
             get() {
@@ -52,6 +53,7 @@ module.exports = function (sequelize, DataTypes) {
             }
         },
         deletedAt: {
+            comment: '删除时间',
             type: DataTypes.DATE,
             defaultValue: null,
             get() {
@@ -66,9 +68,7 @@ module.exports = function (sequelize, DataTypes) {
     })
 
     User.associate = models => {
-        // User.hasMany(models.article)
-        // User.hasMany(models.comment)
-        // User.hasMany(models.reply)
+
     }
 
     return User

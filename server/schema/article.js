@@ -3,22 +3,22 @@ const moment = require('moment')
 module.exports = function (sequelize, DataTypes) {
     const Article = sequelize.define('article', {
         id: {
+            comment: '主键ID',
             type: DataTypes.UUID,
             primaryKey: true,
             allowNull: false,
             defaultValue: DataTypes.UUIDV4
         },
-        // 文章标题
         title: {
+            comment: '文章标题',
             type: DataTypes.STRING,
             allowNull: false,
             unique: true
         },
-        // 文章内容
         content: {
+            comment: '文章内容',
             type: DataTypes.TEXT,
             allowNull: false,
-            // 内容压缩
             get() {
                 const storedValue = this.getDataValue('content')
                 const gzippedBuffer = Buffer.from(storedValue, 'base64')
@@ -30,26 +30,36 @@ module.exports = function (sequelize, DataTypes) {
                 this.setDataValue('content', gzippedBuffer.toString('base64'))
             }
         },
-        // 阅读数
         viewCount: {
+            comment: '阅读数',
             type: DataTypes.INTEGER(11),
             defaultValue: 0
         },
-        // 置顶
         isTop: {
+            comment: '置顶',
             type: DataTypes.BOOLEAN,
             defaultValue: false
         },
-        // 创建时间
+        category: {
+            comment: '文章分类',
+            type: DataTypes.JSON,
+            allowNull: false
+        },
+        tags: {
+            comment: '文章标签',
+            type: DataTypes.JSON,
+            allowNull: true
+        },
         createdAt: {
+            comment: '创建时间',
             type: DataTypes.DATE,
             defaultValue: DataTypes.NOW,
             get() {
                 return moment(this.getDataValue('createdAt')).format('YYYY-MM-DD HH:mm:ss')
             }
         },
-        // 更新时间
         updatedAt: {
+            comment: '更新时间',
             type: DataTypes.DATE,
             defaultValue: DataTypes.NOW,
             get() {
@@ -57,6 +67,7 @@ module.exports = function (sequelize, DataTypes) {
             }
         },
         deletedAt: {
+            comment: '删除时间',
             type: DataTypes.DATE,
             defaultValue: null,
             get() {
@@ -71,17 +82,7 @@ module.exports = function (sequelize, DataTypes) {
     })
 
     Article.associate = models => {
-        Article.hasMany(models.tag)
-        Article.hasOne(models.category)
-        // Article.hasMany(models.comment)
-        // Article.hasMany(models.reply)
 
-        // Article.belongsTo(models.user, {
-        //     as: 'user',
-        //     foreignKey: 'userId',
-        //     targetKey: 'id',
-        //     constraints: false
-        // })
     }
 
     return Article

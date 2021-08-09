@@ -2,27 +2,28 @@ const moment = require('moment')
 module.exports = function (sequelize, DataTypes) {
     const Tag = sequelize.define('tag', {
         id: {
+            comment: '主键ID',
             type: DataTypes.UUID,
             primaryKey: true,
             allowNull: false,
             defaultValue: DataTypes.UUIDV4
         },
-        // 标签名称
         name: {
+            comment: '标签名称',
             type: DataTypes.STRING,
             unique: true,
             allowNull: false
         },
-        // 创建时间
         createdAt: {
+            comment: '创建时间',
             type: DataTypes.DATE,
             defaultValue: DataTypes.NOW,
             get() {
                 return moment(this.getDataValue('createdAt')).format('YYYY-MM-DD HH:mm:ss')
             }
         },
-        // 更新时间
         updatedAt: {
+            comment: '更新时间',
             type: DataTypes.DATE,
             defaultValue: DataTypes.NOW,
             get() {
@@ -30,6 +31,7 @@ module.exports = function (sequelize, DataTypes) {
             }
         },
         deletedAt: {
+            comment: '删除时间',
             type: DataTypes.DATE,
             defaultValue: null,
             get() {
@@ -44,12 +46,7 @@ module.exports = function (sequelize, DataTypes) {
     })
 
     Tag.associate = models => {
-        Tag.belongsTo(models.article, {
-            as: 'article',
-            foreignKey: 'articleId',
-            targetKey: 'id',
-            constraints: false
-        })
+
     }
 
     return Tag
