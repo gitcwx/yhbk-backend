@@ -28,10 +28,8 @@ class UserModel {
             limit,
             offset: (page - 1) * limit,
             where: {
-                $or: {
-                    username: {
-                        $like: `%${keyword}%`
-                    }
+                username: {
+                    $like: `%${keyword}%`
                 }
             },
             order: [

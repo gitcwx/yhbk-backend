@@ -25,10 +25,8 @@ class TagModel {
             limit,
             offset: (page - 1) * limit,
             where: {
-                $or: {
-                    name: {
-                        $like: `%${keyword}%`
-                    }
+                name: {
+                    $like: `%${keyword}%`
                 }
             },
             order: [
