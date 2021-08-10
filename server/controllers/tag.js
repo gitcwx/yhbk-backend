@@ -1,5 +1,6 @@
-const TagModel = require('../modules/tag')
-// const ArticleModel = require('../modules/article')
+const {
+    TagModel
+} = require('../model')
 const { throwSuccess, throwError, pagerVerify, paramsVerify } = require('../common/response')
 
 class TagController {

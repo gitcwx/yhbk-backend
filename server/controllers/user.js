@@ -1,4 +1,6 @@
-const UserModel = require('../modules/user')
+const {
+    UserModel
+} = require('../model')
 const { throwSuccess, throwError, pagerVerify, paramsVerify } = require('../common/response')
 // 引入md5加密方法
 const { MD5 } = require('../../util/encrypt')

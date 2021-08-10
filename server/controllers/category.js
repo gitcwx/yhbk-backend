@@ -1,4 +1,6 @@
-const CategoryModel = require('../modules/category')
+const {
+    CategoryModel
+} = require('../model')
 const { throwSuccess, throwError, pagerVerify, paramsVerify } = require('../common/response')
 
 class CategoryController {

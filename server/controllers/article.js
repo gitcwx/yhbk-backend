@@ -1,7 +1,9 @@
-const ArticleModel = require('../modules/article')
-const categoryModal = require('../modules/category')
-const TagModal = require('../modules/tag')
-const userModal = require('../modules/user')
+const {
+    ArticleModel,
+    CategoryModel,
+    TagModel,
+    UserModel
+} = require('../model')
 const { throwSuccess, throwError, pagerVerify, paramsVerify } = require('../common/response')
 
 class ArticleController {
@@ -99,7 +101,7 @@ class ArticleController {
             }
 
             // authorId是否存在
-            data = await userModal.isExist({
+            data = await UserModel.isExist({
                 id: params.authorId
             })
             if (!data) {
@@ -108,7 +110,7 @@ class ArticleController {
             }
 
             // categoryId是否存在
-            data = await categoryModal.isExist({
+            data = await CategoryModel.isExist({
                 id: params.categoryId
             })
             if (!data) {
@@ -118,7 +120,7 @@ class ArticleController {
 
             // tagId是否存在
             // if (params.tagIds) {
-            //     data = await TagModal.list({
+            //     data = await TagModel.list({
             //         id: params.tagIds
             //     })
 
@@ -181,7 +183,7 @@ class ArticleController {
             }
 
             // authorId是否存在
-            data = await userModal.isExist({
+            data = await UserModel.isExist({
                 id: params.authorId
             })
             if (!data) {
@@ -191,7 +193,7 @@ class ArticleController {
 
             // categoryId是否存在
             if (params.categoryId) {
-                data = await categoryModal.isExist({
+                data = await CategoryModel.isExist({
                     id: params.categoryId
                 })
                 if (!data) {
@@ -202,7 +204,7 @@ class ArticleController {
 
             // tagId是否存在
             if (params.tagIds) {
-                data = await TagModal.list({
+                data = await TagModel.list({
                     id: params.tagIds
                 })
 

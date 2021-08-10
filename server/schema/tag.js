@@ -41,7 +41,7 @@ module.exports = function (sequelize, DataTypes) {
     }, {
         // 软删除
         paranoid: true,
-        // 表名与modal名相同
+        // 表名与model名相同
         freezeTableName: true
     })
 
