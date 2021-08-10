@@ -15,6 +15,17 @@ module.exports = function (sequelize, DataTypes) {
             allowNull: false,
             unique: true
         },
+        cover: {
+            conmment: '文章封面',
+            type: DataTypes.TEXT,
+            allowNull: false,
+            defaultValue: ''
+        },
+        abstract: {
+            comment: '文章摘要',
+            type: DataTypes.TEXT,
+            allowNull: true
+        },
         content: {
             comment: '文章内容',
             type: DataTypes.TEXT,
@@ -35,20 +46,51 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.INTEGER(11),
             defaultValue: 0
         },
+        likeCount: {
+            comment: '点赞数',
+            type: DataTypes.INTEGER(11),
+            defaultValue: 0
+        },
         isTop: {
             comment: '置顶',
             type: DataTypes.BOOLEAN,
             defaultValue: false
+        },
+        status: {
+            comment: '状态 1:展示 2:不展示',
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            defaultValue: 1
+        },
+        categoryId: {
+            comment: '文章分类id',
+            type: DataTypes.UUID,
+            allowNull: false
         },
         category: {
             comment: '文章分类',
             type: DataTypes.JSON,
             allowNull: false
         },
+        tagIds: {
+            comment: '文章标签id',
+            type: DataTypes.TEXT,
+            allowNull: false
+        },
         tags: {
             comment: '文章标签',
             type: DataTypes.JSON,
             allowNull: true
+        },
+        authorId: {
+            comment: '文章作者id',
+            type: DataTypes.UUID,
+            allowNull: false
+        },
+        author: {
+            comment: '文章作者',
+            type: DataTypes.JSON,
+            allowNull: false
         },
         createdAt: {
             comment: '创建时间',

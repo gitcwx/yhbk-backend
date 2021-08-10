@@ -9,7 +9,7 @@ module.exports = function (sequelize, DataTypes) {
             defaultValue: DataTypes.UUIDV4
         },
         username: {
-            comment: '用户名',
+            comment: '登录名',
             type: DataTypes.STRING,
             allowNull: false
         },
@@ -23,8 +23,71 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.STRING,
             allowNull: false
         },
+        nickname: {
+            comment: '昵称',
+            type: DataTypes.STRING,
+            allowNull: false
+        },
+        motto: {
+            comment: '个性签名',
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        birth: {
+            comment: '出生日期',
+            type: DataTypes.DATE,
+            allowNull: true,
+            get() {
+                return moment(this.getDataValue('birth')).format('YYYY-MM-DD HH:mm:ss')
+            },
+            set () {
+                return moment(this.getDataValue('birth')).format('YYYY-MM-DD HH:mm:ss')
+            }
+        },
+        gender: {
+            comment: '性别 0:未知 1:男 2:女',
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            defaultValue: 0
+        },
+        location: {
+            comment: '省市县区',
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        avatar: {
+            comment: '用户头像',
+            type: DataTypes.TEXT,
+            allowNull: true
+        },
+        email: {
+            comment: '邮箱',
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        phone: {
+            comment: '手机号',
+            type: DataTypes.STRING,
+            allowNull: true
+        },
         ip: {
             comment: '用户ip',
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        status: {
+            comment: '用户状态 1:正常 2:禁言 3:冻结',
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            defaultValue: 1
+        },
+        loginFrom: {
+            comment: '登录途径 0:本站注册 1:QQ授权 2: ',
+            type: DataTypes.INTEGER,
+            defaultValue: 0
+        },
+        authKey: {
+            comment: '认证密钥',
             type: DataTypes.STRING,
             allowNull: true
         },

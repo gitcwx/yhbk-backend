@@ -1,6 +1,6 @@
 const moment = require('moment')
 module.exports = function (sequelize, DataTypes) {
-    const Comment = sequelize.define('comment', {
+    const Reply = sequelize.define('reply', {
         id: {
             comment: '主键ID',
             type: DataTypes.UUID,
@@ -8,8 +8,8 @@ module.exports = function (sequelize, DataTypes) {
             allowNull: false,
             defaultValue: DataTypes.UUIDV4
         },
-        articleId: {
-            comment: '文章ID',
+        commentId: {
+            comment: '评论ID',
             type: DataTypes.UUID,
             allowNull: false
         },
@@ -63,9 +63,9 @@ module.exports = function (sequelize, DataTypes) {
         freezeTableName: true
     })
 
-    Comment.associate = models => {
+    Reply.associate = models => {
 
     }
 
-    return Comment
+    return Reply
 }
