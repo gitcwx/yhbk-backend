@@ -15,18 +15,21 @@ Category.sync({ force: true }).then(() => {
 class CategoryModel {
     // 查询列表
     static async list(params) {
-        const page = Number(params.page || 1)
-        const limit = Number(params.limit || 10)
-        const orderby = params.orderby || 'desc'
-        const orderName = params.orderName || 'updatedAt'
-        const keyword = params.keyword || ''
+        const {
+            page,
+            limit,
+            orderby,
+            orderName,
+            name
+        } = params
 
         return await Category.findAndCountAll({
+            attributes: { exclude: ['deletedAt'] },
             limit,
             offset: (page - 1) * limit,
             where: {
                 name: {
-                    $like: `%${keyword}%`
+                    $like: `%${name}%`
                 }
             },
             order: [
@@ -45,7 +48,7 @@ class CategoryModel {
     // 数据编辑
     static async edit(params, categoryId) {
         const data = {}
-        if (params.name !== undefined) {
+        if (params.name) {
             data.name = params.name
         }
         return await Category.update(data, {

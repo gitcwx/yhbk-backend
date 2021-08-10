@@ -18,13 +18,13 @@ module.exports = function (sequelize, DataTypes) {
         cover: {
             conmment: '文章封面',
             type: DataTypes.TEXT,
-            allowNull: false,
+            allowNull: true,
             defaultValue: ''
         },
         abstract: {
             comment: '文章摘要',
             type: DataTypes.TEXT,
-            allowNull: true
+            allowNull: false
         },
         content: {
             comment: '文章内容',
@@ -113,7 +113,8 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.DATE,
             defaultValue: null,
             get() {
-                return moment(this.getDataValue('updatedAt')).format('YYYY-MM-DD HH:mm:ss')
+                const value = this.getDataValue('birth')
+                return value ? moment(this.getDataValue('birth')).format('YYYY-MM-DD') : null
             }
         }
     }, {

@@ -8,6 +8,12 @@ class CategoryController {
         try {
             const params = ctx.request.body
 
+            const page = Number(params.page || 1)
+            const limit = Number(params.limit || 10)
+            const orderby = params.orderby || 'desc'
+            const orderName = params.orderName || 'updatedAt'
+            const name = params.name || ''
+
             // 参数规则检测
             const errorResponse = pagerVerify(params)
             if (errorResponse) {
@@ -15,7 +21,13 @@ class CategoryController {
                 return
             }
 
-            const result = await CategoryModel.list(params)
+            const result = await CategoryModel.list({
+                page,
+                limit,
+                orderby,
+                orderName,
+                name
+            })
             throwSuccess(ctx, {
                 msg: '查询成功',
                 data: result.rows,
@@ -44,7 +56,7 @@ class CategoryController {
             }
 
             // 查询是否存在同名分类
-            let data = await CategoryModel.isExist({
+            const data = await CategoryModel.isExist({
                 name: params.name
             })
             if (data) {
@@ -53,10 +65,9 @@ class CategoryController {
             }
 
             // 执行写入
-            data = await CategoryModel.add(params)
+            await CategoryModel.add(params)
             throwSuccess(ctx, {
-                msg: '添加成功',
-                data
+                msg: '添加成功'
             })
         } catch (err) {
             throwError(ctx, 500)
@@ -65,18 +76,21 @@ class CategoryController {
 
     static async edit(ctx) {
         try {
-            const params = ctx.request.body
+            const {
+                id,
+                name
+            } = ctx.request.body
 
             // 参数规则检测
             const errorResponse = paramsVerify([
                 {
                     msgLabel: 'id',
-                    value: params.id,
+                    value: id,
                     rules: { required: true }
                 },
                 {
                     msgLabel: '分类名',
-                    value: params.name,
+                    value: name,
                     rules: { required: true, max: 10 }
                 }
             ])
@@ -85,26 +99,24 @@ class CategoryController {
                 return
             }
 
-            // 查询是否存在同名
-            let data = await CategoryModel.isExist({
-                name: params.name
-            })
-            if (data) {
-                throwError(ctx, 'isExist', { msg: params.name + '已存在' })
-                return
-            }
-
             // 查询是否存在
-            data = await CategoryModel.isExist({
-                id: params.id
-            })
+            let data = await CategoryModel.isExist({ id })
             if (!data) {
                 throwError(ctx, 'notExist', { msg: '该数据不存在' })
                 return
             }
 
+            // 查询是否存在同名
+            data = await CategoryModel.isExist({ name })
+            if (data) {
+                throwError(ctx, 'isExist', { msg: name + '已存在' })
+                return
+            }
+
             // 执行写入
-            await CategoryModel.edit(params, params.id)
+            await CategoryModel.edit({
+                name
+            }, id)
             throwSuccess(ctx, {
                 msg: '修改成功'
             })
@@ -115,15 +127,11 @@ class CategoryController {
 
     static async del(ctx) {
         try {
-            const params = ctx.request.body
+            const { id } = ctx.request.body
 
             // 参数规则检测
             const errorResponse = paramsVerify([
-                {
-                    msgLabel: 'id',
-                    value: params.id,
-                    rules: { required: true }
-                }
+                { msgLabel: 'id', value: id, rules: { required: true } }
             ])
             if (errorResponse) {
                 throwError(ctx, 'rules', errorResponse)
@@ -131,16 +139,14 @@ class CategoryController {
             }
 
             // 查询是否存在
-            const data = await CategoryModel.isExist({
-                id: params.id
-            })
+            const data = await CategoryModel.isExist({ id })
             if (!data) {
                 throwError(ctx, 'notExist', { msg: '该数据不存在' })
                 return
             }
 
             // 执行写入
-            await CategoryModel.del(params.id)
+            await CategoryModel.del(id)
             throwSuccess(ctx, {
                 msg: '删除成功'
             })

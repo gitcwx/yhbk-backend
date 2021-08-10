@@ -8,6 +8,12 @@ class TagController {
         try {
             const params = ctx.request.body
 
+            const page = Number(params.page || 1)
+            const limit = Number(params.limit || 10)
+            const orderby = params.orderby || 'desc'
+            const orderName = params.orderName || 'updatedAt'
+            const name = params.name || ''
+
             // 参数规则检测
             const errorResponse = pagerVerify(params)
             if (errorResponse) {
@@ -15,7 +21,13 @@ class TagController {
                 return
             }
 
-            const result = await TagModel.list(params)
+            const result = await TagModel.list({
+                page,
+                limit,
+                orderby,
+                orderName,
+                name
+            })
             throwSuccess(ctx, {
                 msg: '查询成功',
                 data: result.rows,
@@ -44,7 +56,7 @@ class TagController {
             }
 
             // 查询是否存在同名标签
-            let data = await TagModel.isExist({
+            const data = await TagModel.isExist({
                 name: params.name
             })
             if (data) {
@@ -53,10 +65,9 @@ class TagController {
             }
 
             // 执行写入
-            data = await TagModel.add(params)
+            await TagModel.add({ name: params.name })
             throwSuccess(ctx, {
-                msg: '添加成功',
-                data
+                msg: '添加成功'
             })
         } catch (err) {
             throwError(ctx, 500)
@@ -65,18 +76,21 @@ class TagController {
 
     static async edit(ctx) {
         try {
-            const params = ctx.request.body
+            const {
+                id,
+                name
+            } = ctx.request.body
 
             // 参数规则检测
             const errorResponse = paramsVerify([
                 {
                     msgLabel: 'id',
-                    value: params.id,
+                    value: id,
                     rules: { required: true }
                 },
                 {
                     msgLabel: '标签名',
-                    value: params.name,
+                    value: name,
                     rules: { required: true, max: 10 }
                 }
             ])
@@ -85,26 +99,24 @@ class TagController {
                 return
             }
 
-            // 查询是否存在同名
-            let data = await TagModel.isExist({
-                name: params.name
-            })
-            if (data) {
-                throwError(ctx, 'isExist', { msg: params.name + '已存在' })
-                return
-            }
-
             // 查询是否存在
-            data = await TagModel.isExist({
-                id: params.id
-            })
+            let data = await TagModel.isExist({ id })
             if (!data) {
                 throwError(ctx, 'notExist', { msg: '该数据不存在' })
                 return
             }
 
+            // 查询是否存在同名
+            data = await TagModel.isExist({ name })
+            if (data) {
+                throwError(ctx, 'isExist', { msg: name + '已存在' })
+                return
+            }
+
             // 执行写入
-            await TagModel.edit(params, params.id)
+            await TagModel.edit({
+                name
+            }, id)
             throwSuccess(ctx, {
                 msg: '修改成功'
             })
@@ -115,15 +127,11 @@ class TagController {
 
     static async del(ctx) {
         try {
-            const params = ctx.request.body
+            const { id } = ctx.request.body
 
             // 参数规则检测
             const errorResponse = paramsVerify([
-                {
-                    msgLabel: 'id',
-                    value: params.id,
-                    rules: { required: true }
-                }
+                { msgLabel: 'id', value: id, rules: { required: true } }
             ])
             if (errorResponse) {
                 throwError(ctx, 'rules', errorResponse)
@@ -131,16 +139,14 @@ class TagController {
             }
 
             // 查询是否存在
-            const data = await TagModel.isExist({
-                id: params.id
-            })
+            const data = await TagModel.isExist({ id })
             if (!data) {
                 throwError(ctx, 'notExist', { msg: '该数据不存在' })
                 return
             }
 
             // 执行写入
-            await TagModel.del(params.id)
+            await TagModel.del(id)
             throwSuccess(ctx, {
                 msg: '删除成功'
             })

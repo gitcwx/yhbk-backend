@@ -53,7 +53,8 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.DATE,
             defaultValue: null,
             get() {
-                return moment(this.getDataValue('updatedAt')).format('YYYY-MM-DD HH:mm:ss')
+                const value = this.getDataValue('birth')
+                return value ? moment(this.getDataValue('birth')).format('YYYY-MM-DD') : null
             }
         }
     }, {

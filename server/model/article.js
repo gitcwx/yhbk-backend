@@ -20,24 +20,26 @@ Article.sync({ force: true }).then(() => {
 class ArticleModel {
     // 查询列表
     static async list(params) {
-        const page = Number(params.page || 1)
-        const limit = Number(params.limit || 10)
-        const orderby = params.orderby || 'desc'
-        const orderName = params.orderName || 'updatedAt'
-        const keyword = params.keyword || ''
-
-        return await Article.findAll({
-            limit: Number(limit),
+        const {
+            page,
+            limit,
+            orderby,
+            orderName,
+            keyword
+        } = params
+        return await Article.findAndCountAll({
+            attributes: { exclude: ['deletedAt', 'content'] },
+            limit,
             offset: (page - 1) * limit,
             where: {
                 $or: {
                     title: {
                         $like: `%${keyword}%`
+                    },
+                    abstract: {
+                        $like: `%${keyword}%`
                     }
                     // content已经转base64 暂时无法查找
-                    // content: {
-                    //     $like: `%${keyword}%`
-                    // }
                 }
             },
             order: [
@@ -49,6 +51,7 @@ class ArticleModel {
     // 文章详情
     static async detail(id) {
         return await Article.findOne({
+            attributes: { exclude: ['deletedAt'] },
             where: {
                 id
             }
@@ -57,30 +60,12 @@ class ArticleModel {
 
     // 数据插入
     static async add(params) {
-        const tags = params.tagIds ? params.tagIds.split(',').map(v => ({ name: v })) : []
-        return await Article.create({
-            title: params.title,
-            content: params.content,
-            authorId: params.authorId,
-            category: { name: params.categoryId },
-            tags,
-            isTop: params.isTop === 'true'
-        })
+        return await Article.create(params)
     }
 
     // 数据编辑
     static async edit(params, articleId) {
-        const newData = {}
-        if (params.title !== undefined) {
-            newData.title = params.title
-        }
-        if (params.content !== undefined) {
-            newData.content = params.content
-        }
-        if (params.isTop !== undefined) {
-            newData.isTop = params.isTop === 'true'
-        }
-        await Article.update(newData, {
+        await Article.update(params, {
             where: {
                 id: articleId
             }

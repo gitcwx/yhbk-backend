@@ -65,17 +65,11 @@ class UserController {
             return
         }
 
-        // 查询是否存在
-        let data = await UserModel.isExist({
-            id: params.id
-        })
+        const data = await UserModel.info(params.id)
         if (!data) {
             throwError(ctx, 'notExist', { msg: '该用户不存在' })
             return
         }
-
-        // 执行写入
-        data = await UserModel.info(params.id)
         throwSuccess(ctx, {
             msg: '查询成功',
             data

@@ -39,7 +39,7 @@ class UserModel {
         if (loginFrom) { conditions.loginFrom = loginFrom }
 
         return await User.findAndCountAll({
-            attributes: { exclude: ['salt', 'password', 'ip', 'authKey'] },
+            attributes: { exclude: ['salt', 'password', 'ip', 'authKey', 'deletedAt'] },
             limit,
             offset: (page - 1) * limit,
             where: conditions,
@@ -52,7 +52,7 @@ class UserModel {
     // 查询用户信息
     static async info(id) {
         return await User.findOne({
-            attributes: { exclude: ['salt', 'password', 'ip', 'authKey'] },
+            attributes: { exclude: ['salt', 'password', 'ip', 'authKey', 'deletedAt'] },
             where: {
                 id
             }
@@ -122,18 +122,16 @@ class UserModel {
 
     // 查询数据是否存在
     static async isExist(params) {
-        const {
-            id = '',
-            username = ''
-        } = params
+        const conditions = {}
+        if (params.id) {
+            conditions.id = params.id
+        }
+        if (params.username) {
+            conditions.username = params.username
+        }
 
         return await User.findOne({
-            where: {
-                $or: {
-                    id,
-                    username
-                }
-            }
+            where: conditions
         })
     }
 }

@@ -15,18 +15,21 @@ Tag.sync({ force: true }).then(() => {
 class TagModel {
     // 查询列表
     static async list(params) {
-        const page = Number(params.page || 1)
-        const limit = Number(params.limit || 10)
-        const orderby = params.orderby || 'desc'
-        const orderName = params.orderName || 'updatedAt'
-        const keyword = params.keyword || ''
+        const {
+            page,
+            limit,
+            orderby,
+            orderName,
+            name
+        } = params
 
         return await Tag.findAndCountAll({
+            attributes: { exclude: ['deletedAt'] },
             limit,
             offset: (page - 1) * limit,
             where: {
                 name: {
-                    $like: `%${keyword}%`
+                    $like: `%${name}%`
                 }
             },
             order: [
@@ -45,7 +48,7 @@ class TagModel {
     // 数据编辑
     static async edit(params, tagId) {
         const data = {}
-        if (params.name !== undefined) {
+        if (params.name) {
             data.name = params.name
         }
         return await Tag.update(data, {
@@ -76,6 +79,17 @@ class TagModel {
 
         return await Tag.findOne({
             where: conditions
+        })
+    }
+
+    // 根据IDs查询
+    static async queryByIds(ids) {
+        return await Tag.findAll({
+            where: {
+                id: {
+                    $in: ids.split(',')
+                }
+            }
         })
     }
 }
