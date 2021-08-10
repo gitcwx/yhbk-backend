@@ -113,7 +113,7 @@ const paramsVerify = (data) => {
 
         // 判断非空
         if (
-            !value && rules.required
+            rules.required && !value
         ) {
             result = { code: 'e11', msg: `${msgLabel}不可为空` }
             break
@@ -132,7 +132,7 @@ const paramsVerify = (data) => {
 
         // 正则判断
         if (
-            rules.reg && !rules.reg.test(value)
+            rules.reg && !!value && !rules.reg.test(value)
         ) {
             result = { code: 'e13', msg: `${msgLabel}格式不合规` }
             break

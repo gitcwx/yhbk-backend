@@ -13,6 +13,11 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.STRING,
             allowNull: false
         },
+        nickname: {
+            comment: '昵称',
+            type: DataTypes.STRING,
+            allowNull: false
+        },
         password: {
             comment: '密码',
             type: DataTypes.STRING,
@@ -23,25 +28,18 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.STRING,
             allowNull: false
         },
-        nickname: {
-            comment: '昵称',
-            type: DataTypes.STRING,
-            allowNull: false
-        },
         motto: {
             comment: '个性签名',
             type: DataTypes.STRING,
             allowNull: true
         },
         birth: {
-            comment: '出生日期',
+            comment: '生日',
             type: DataTypes.DATE,
             allowNull: true,
-            get() {
-                return moment(this.getDataValue('birth')).format('YYYY-MM-DD HH:mm:ss')
-            },
-            set () {
-                return moment(this.getDataValue('birth')).format('YYYY-MM-DD HH:mm:ss')
+            get () {
+                const value = this.getDataValue('birth')
+                return value ? moment(this.getDataValue('birth')).format('YYYY-MM-DD') : null
             }
         },
         gender: {
@@ -95,6 +93,7 @@ module.exports = function (sequelize, DataTypes) {
             comment: '上次登录时间',
             type: DataTypes.DATE,
             allowNull: true,
+            defaultValue: DataTypes.NOW,
             get() {
                 return moment(this.getDataValue('lastLoginAt')).format('YYYY-MM-DD HH:mm:ss')
             }

@@ -17,24 +17,45 @@ User.sync({ force: true }).then(() => {
 class UserModel {
     // 查询列表
     static async list(params) {
-        const page = Number(params.page || 1)
-        const limit = Number(params.limit || 10)
-        const orderby = params.orderby || 'desc'
-        const orderName = params.orderName || 'updatedAt'
-        const keyword = params.keyword || ''
+        const {
+            page,
+            limit,
+            orderby,
+            orderName,
+            nickname,
+            gender,
+            status,
+            loginFrom
+        } = params
+
+        const conditions = {}
+        if (nickname) {
+            conditions.nickname = {
+                $like: `%${nickname}%`
+            }
+        }
+        if (gender) { conditions.gender = gender }
+        if (status) { conditions.status = status }
+        if (loginFrom) { conditions.loginFrom = loginFrom }
 
         return await User.findAndCountAll({
-            attributes: { exclude: ['salt', 'password', 'ip'] },
+            attributes: { exclude: ['salt', 'password', 'ip', 'authKey'] },
             limit,
             offset: (page - 1) * limit,
-            where: {
-                username: {
-                    $like: `%${keyword}%`
-                }
-            },
+            where: conditions,
             order: [
                 [orderName, orderby]
             ]
+        })
+    }
+
+    // 查询用户信息
+    static async info(id) {
+        return await User.findOne({
+            attributes: { exclude: ['salt', 'password', 'ip', 'authKey'] },
+            where: {
+                id
+            }
         })
     }
 
@@ -60,6 +81,7 @@ class UserModel {
 
         return await User.create({
             username: params.username,
+            nickname: params.username,
             password,
             salt
         })
@@ -72,8 +94,7 @@ class UserModel {
 
         return await User.update({
             salt,
-            password,
-            updatedAt: new Date()
+            password
         }, {
             where: {
                 id: params.id
@@ -82,14 +103,8 @@ class UserModel {
     }
 
     // 数据编辑
-    static async info(params, userId) {
-        const conditions = {}
-        if (params.username) {
-            conditions.username = params.username
-        }
-        params.updatedAt = new Date()
-
-        return await User.update(conditions, {
+    static async edit(params, userId) {
+        return await User.update(params, {
             where: {
                 id: userId
             }
@@ -107,16 +122,18 @@ class UserModel {
 
     // 查询数据是否存在
     static async isExist(params) {
-        const conditions = {}
-        if (params.id) {
-            conditions.id = params.id
-        }
-        if (params.username) {
-            conditions.username = params.username
-        }
+        const {
+            id = '',
+            username = ''
+        } = params
 
         return await User.findOne({
-            where: conditions
+            where: {
+                $or: {
+                    id,
+                    username
+                }
+            }
         })
     }
 }
