@@ -5,7 +5,6 @@ const {
     // comment: Comment,
     // user: User,
     // reply: Reply
-    // sequelize
 } = require('../schema')
 
 // 引入默认数据
@@ -24,24 +23,40 @@ class ArticleModel {
             page,
             limit,
             orderby,
-            orderName,
-            keyword
+            orderName
         } = params
+
+        const conditions = {}
+        if (params.keyword) {
+            conditions.$or = {
+                title: {
+                    $like: `%${params.keyword}%`
+                },
+                abstract: {
+                    $like: `%${params.keyword}%`
+                }
+                // content已经转base64 暂时无法查找
+            }
+        }
+        if (params.isTop !== undefined) {
+            conditions.isTop = params.isTop === 'true'
+        }
+        if (params.status) {
+            conditions.status = params.status
+        }
+        if (params.categoryId) {
+            conditions.categoryId = params.categoryId
+        }
+        if (params.tagIds) {
+            conditions.tagIds = {
+                $regexp: params.tagIds.replace(/,/g, '|')
+            }
+        }
         return await Article.findAndCountAll({
             attributes: { exclude: ['deletedAt', 'content'] },
             limit,
             offset: (page - 1) * limit,
-            where: {
-                $or: {
-                    title: {
-                        $like: `%${keyword}%`
-                    },
-                    abstract: {
-                        $like: `%${keyword}%`
-                    }
-                    // content已经转base64 暂时无法查找
-                }
-            },
+            where: conditions,
             order: [
                 [orderName, orderby]
             ]
@@ -65,6 +80,7 @@ class ArticleModel {
 
     // 数据编辑
     static async edit(params, articleId) {
+        console.log(params, articleId)
         await Article.update(params, {
             where: {
                 id: articleId

@@ -102,7 +102,7 @@ class TagController {
             // 查询是否存在
             let data = await TagModel.isExist({ id })
             if (!data) {
-                throwError(ctx, 'notExist', { msg: '该数据不存在' })
+                throwError(ctx, 'notExist', { msg: '该数据已不存在' })
                 return
             }
 
@@ -141,7 +141,7 @@ class TagController {
             // 查询是否存在
             const data = await TagModel.isExist({ id })
             if (!data) {
-                throwError(ctx, 'notExist', { msg: '该数据不存在' })
+                throwError(ctx, 'notExist', { msg: '该数据已不存在' })
                 return
             }
 
