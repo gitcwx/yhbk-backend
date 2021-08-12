@@ -1,5 +1,6 @@
 const {
-    UserModel
+    UserModel,
+    ArticleModel
 } = require('../model')
 const { throwSuccess, throwError, pagerVerify, paramsVerify } = require('../common/response')
 // 引入md5加密方法
@@ -306,7 +307,7 @@ class UserController {
             }
 
             // 查询是否存在
-            const data = await UserModel.isExist({ id })
+            let data = await UserModel.isExist({ id })
             if (!data) {
                 throwError(ctx, 'notExist', { msg: '该用户不存在' })
                 return
@@ -321,7 +322,17 @@ class UserController {
                 email,
                 phone,
                 status
-            }, id)
+            }, {
+                id
+            })
+            // 获取用户更新后的信息
+            data = await UserModel.info(id)
+            // 更新文章
+            await ArticleModel.edit({
+                author: data
+            }, {
+                authorId: id
+            })
             throwSuccess(ctx, {
                 msg: '修改成功'
             })
@@ -345,9 +356,16 @@ class UserController {
             }
 
             // 查询是否存在
-            const data = await UserModel.isExist({ id })
+            let data = await UserModel.isExist({ id })
             if (!data) {
                 throwError(ctx, 'notExist', { msg: '该用户不存在' })
+                return
+            }
+
+            // 查询分类下面有没有文章
+            data = await ArticleModel.isExist({ authorId: id })
+            if (data) {
+                throwError(ctx, 'isExist', { msg: '该用户下存在文章，不可删除' })
                 return
             }
 

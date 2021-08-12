@@ -103,11 +103,10 @@ class UserModel {
     }
 
     // 数据编辑
-    static async edit(params, userId) {
+    static async edit(params, conditions) {
         return await User.update(params, {
-            where: {
-                id: userId
-            }
+            where: conditions,
+            returning: true
         })
     }
 
