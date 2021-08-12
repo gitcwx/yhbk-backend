@@ -115,6 +115,7 @@ class ArticleController {
                 throwError(ctx, 'notExist', { msg: '文章分类不合规' })
                 return
             }
+            const categoryName = category.name
 
             // 非必填参数
             const temp = {}
@@ -138,7 +139,7 @@ class ArticleController {
                 authorId,
                 author,
                 categoryId,
-                category,
+                categoryName,
                 ...temp
             })
             throwSuccess(ctx, {
@@ -197,11 +198,13 @@ class ArticleController {
             }
             // categoryId改变
             if (data.categoryId !== categoryId) {
-                temp.categoryId = categoryId
-                temp.category = await CategoryModel.isExist({ id: categoryId })
-                if (!temp.category) {
+                const category = await CategoryModel.isExist({ id: categoryId })
+                if (!category) {
                     throwError(ctx, 'notExist', { msg: '文章分类不合规' })
                     return
+                } else {
+                    temp.categoryName = category.name
+                    temp.categoryId = categoryId
                 }
             }
             // tagId改变
@@ -227,12 +230,13 @@ class ArticleController {
             }
             // 执行写入
             await ArticleModel.edit({
-                id,
                 title,
                 abstract,
                 content,
                 ...temp
-            }, id)
+            }, {
+                id
+            })
             throwSuccess(ctx, {
                 msg: '修改成功'
             })

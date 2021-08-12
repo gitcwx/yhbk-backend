@@ -32,13 +32,17 @@ module.exports = function (sequelize, DataTypes) {
             allowNull: false,
             get() {
                 const storedValue = this.getDataValue('content')
-                const gzippedBuffer = Buffer.from(storedValue, 'base64')
-                const unzippedBuffer = gunzipSync(gzippedBuffer)
-                return unzippedBuffer.toString()
+                if (storedValue) {
+                    const gzippedBuffer = Buffer.from(storedValue, 'base64')
+                    const unzippedBuffer = gunzipSync(gzippedBuffer)
+                    return unzippedBuffer.toString()
+                }
             },
             set(value) {
-                const gzippedBuffer = gzipSync(value)
-                this.setDataValue('content', gzippedBuffer.toString('base64'))
+                if (value) {
+                    const gzippedBuffer = gzipSync(value)
+                    this.setDataValue('content', gzippedBuffer.toString('base64'))
+                }
             }
         },
         viewCount: {
@@ -67,9 +71,9 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.UUID,
             allowNull: false
         },
-        category: {
-            comment: '文章分类',
-            type: DataTypes.JSON,
+        categoryName: {
+            comment: '文章分类名称',
+            type: DataTypes.STRING,
             allowNull: false
         },
         tagIds: {

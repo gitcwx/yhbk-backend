@@ -1,5 +1,6 @@
 const {
-    CategoryModel
+    CategoryModel,
+    ArticleModel
 } = require('../model')
 const { throwSuccess, throwError, pagerVerify, paramsVerify } = require('../common/response')
 
@@ -117,6 +118,13 @@ class CategoryController {
             await CategoryModel.edit({
                 name
             }, id)
+
+            // 更新文章
+            await ArticleModel.edit({
+                categoryName: name
+            }, {
+                categoryId: id
+            })
             throwSuccess(ctx, {
                 msg: '修改成功'
             })
@@ -139,9 +147,16 @@ class CategoryController {
             }
 
             // 查询是否存在
-            const data = await CategoryModel.isExist({ id })
+            let data = await CategoryModel.isExist({ id })
             if (!data) {
                 throwError(ctx, 'notExist', { msg: '该数据已不存在' })
+                return
+            }
+
+            // 查询分类下面有没有文章
+            data = await ArticleModel.isExist({ categoryId: id })
+            if (data) {
+                throwError(ctx, 'isExist', { msg: '该分类下存在文章，不可删除' })
                 return
             }
 

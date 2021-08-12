@@ -26,7 +26,7 @@ const config = {
         }
     },
     token: {
-        key: 'token',
+        key: 'youhebuke',
         expire: '24h'
     }
 }

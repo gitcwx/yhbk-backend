@@ -79,12 +79,9 @@ class ArticleModel {
     }
 
     // 数据编辑
-    static async edit(params, articleId) {
-        console.log(params, articleId)
+    static async edit(params, conditions) {
         await Article.update(params, {
-            where: {
-                id: articleId
-            }
+            where: conditions
         })
     }
 
@@ -98,15 +95,7 @@ class ArticleModel {
     }
 
     // 查询数据是否存在
-    static async isExist(params) {
-        const conditions = {}
-        if (params.id) {
-            conditions.id = params.id
-        }
-        if (params.title) {
-            conditions.title = params.title
-        }
-
+    static async isExist(conditions) {
         return await Article.findOne({
             where: conditions
         })
