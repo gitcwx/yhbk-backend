@@ -1,10 +1,5 @@
 const {
     article: Article
-    // tag: Tag,
-    // category: Category
-    // comment: Comment,
-    // user: User,
-    // reply: Reply
 } = require('../schema')
 
 // 引入默认数据
@@ -53,7 +48,9 @@ class ArticleModel {
             }
         }
         return await Article.findAndCountAll({
-            attributes: { exclude: ['deletedAt', 'content'] },
+            attributes: {
+                exclude: ['deletedAt', 'content']
+            },
             limit,
             offset: (page - 1) * limit,
             where: conditions,
@@ -80,7 +77,7 @@ class ArticleModel {
 
     // 数据编辑
     static async edit(params, conditions) {
-        await Article.update(params, {
+        return await Article.update(params, {
             where: conditions
         })
     }

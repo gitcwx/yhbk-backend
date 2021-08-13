@@ -46,15 +46,9 @@ class TagModel {
     }
 
     // 数据编辑
-    static async edit(params, tagId) {
-        const data = {}
-        if (params.name) {
-            data.name = params.name
-        }
-        return await Tag.update(data, {
-            where: {
-                id: tagId
-            }
+    static async edit(params, conditions) {
+        return await Tag.update(params, {
+            where: conditions
         })
     }
 
@@ -83,11 +77,12 @@ class TagModel {
     }
 
     // 根据IDs查询
-    static async queryByIds(ids) {
+    static async queryByIds(idsArr) {
         return await Tag.findAll({
+            attributes: ['id', 'name'],
             where: {
                 id: {
-                    $in: ids.split(',')
+                    $in: idsArr
                 }
             }
         })

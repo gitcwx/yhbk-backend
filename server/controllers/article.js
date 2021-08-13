@@ -27,6 +27,7 @@ class ArticleController {
                 return
             }
 
+            // 查询文章列表
             const result = await ArticleModel.list({
                 page,
                 limit,
@@ -38,6 +39,28 @@ class ArticleController {
                 categoryId,
                 tagIds
             })
+
+            // 降维 去重 获取tagId集合
+            const allTagIdsArr = Array.from(
+                new Set(
+                    result.rows
+                        .map(v => v.tagIds.split(','))
+                        .flat()
+                )
+            )
+            if (allTagIdsArr.length) {
+                // 查询这些tag属性
+                const tags = await TagModel.queryByIds(allTagIdsArr)
+                // 数组转对象
+                const tagsMap = {}
+                tags.forEach(item => {
+                    tagsMap[item.dataValues.id] = item.dataValues.name
+                })
+                result.rows.forEach(item => {
+                    item.dataValues.tags = item.dataValues.tagIds.split(',').map(v => ({ id: v, name: tagsMap[v] }))
+                })
+            }
+
             throwSuccess(ctx, {
                 msg: '查询成功',
                 data: result.rows,
@@ -65,6 +88,11 @@ class ArticleController {
             if (!data) {
                 throwError(ctx, 'notExist', { msg: '该数据已不存在' })
                 return
+            }
+            const idsArr = data.tagIds.split(',')
+            if (idsArr.length) {
+                const tagsArr = await TagModel.queryByIds(idsArr)
+                data.dataValues.tags = tagsArr
             }
             throwSuccess(ctx, {
                 msg: '查询成功',
@@ -103,7 +131,7 @@ class ArticleController {
             }
 
             // authorId是否存在
-            const author = await UserModel.isExist({ id: authorId })
+            const author = await UserModel.info(authorId)
             if (!author) {
                 throwError(ctx, 'notExist', { msg: '作者ID不存在' })
                 return
@@ -117,16 +145,26 @@ class ArticleController {
             }
             const categoryName = category.name
 
+            // 查询是否存在同名文章
+            const data = await ArticleModel.isExist({ title })
+            if (data) {
+                throwError(ctx, 'isExist', { msg: title + '已存在' })
+                return
+            }
+
             // 非必填参数
             const temp = {}
             if (tagIds) {
-                temp.tagIds = tagIds
-                temp.tags = await TagModel.queryByIds(tagIds)
-                if (!temp.tags.length) {
-                    throwError(ctx, 'notExist', { msg: '标签分类不合规' })
+                const idsArr = tagIds.split(',')
+                const tagsArr = await TagModel.queryByIds(idsArr)
+                if (tagsArr.length === idsArr.length) {
+                    temp.tagIds = tagIds
+                } else {
+                    throwError(ctx, 'notExist', { msg: '存在不合规的标签' })
                     return
                 }
             }
+
             cover && (temp.cover = cover)
             isTop && (temp.isTop = isTop === 'true')
             status && (temp.status = status)
@@ -209,11 +247,17 @@ class ArticleController {
             }
             // tagId改变
             if (tagIds !== undefined && data.tagIds !== tagIds) {
-                temp.tagIds = tagIds
-                temp.tags = tagIds ? await TagModel.queryByIds(tagIds) : []
-                if (!temp.tags.length) {
-                    throwError(ctx, 'notExist', { msg: '标签分类不合规' })
-                    return
+                const idsArr = tagIds.split(',')
+                if (idsArr.length) {
+                    const tagsArr = await TagModel.queryByIds(idsArr)
+                    if (tagsArr.length === idsArr.length) {
+                        temp.tagIds = tagIds
+                    } else {
+                        throwError(ctx, 'notExist', { msg: '存在不合规的标签' })
+                        return
+                    }
+                } else {
+                    temp.tagIds = ''
                 }
             }
             // 封面改变

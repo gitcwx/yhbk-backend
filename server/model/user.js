@@ -120,15 +120,7 @@ class UserModel {
     }
 
     // 查询数据是否存在
-    static async isExist(params) {
-        const conditions = {}
-        if (params.id) {
-            conditions.id = params.id
-        }
-        if (params.username) {
-            conditions.username = params.username
-        }
-
+    static async isExist(conditions) {
         return await User.findOne({
             where: conditions
         })

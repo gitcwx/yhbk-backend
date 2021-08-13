@@ -116,7 +116,9 @@ class TagController {
             // 执行写入
             await TagModel.edit({
                 name
-            }, id)
+            }, {
+                id
+            })
             throwSuccess(ctx, {
                 msg: '修改成功'
             })

@@ -81,11 +81,6 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.TEXT,
             allowNull: false
         },
-        tags: {
-            comment: '文章标签',
-            type: DataTypes.JSON,
-            allowNull: true
-        },
         authorId: {
             comment: '文章作者id',
             type: DataTypes.UUID,
