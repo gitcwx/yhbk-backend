@@ -89,6 +89,12 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.STRING,
             allowNull: true
         },
+        permissionLevel: {
+            comment: '用户权限级别 0:超级管理员 1:管理员 2:普通用户 9:游客',
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            defaultValue: 9
+        },
         lastLoginAt: {
             comment: '上次登录时间',
             type: DataTypes.DATE,

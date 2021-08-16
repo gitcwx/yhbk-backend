@@ -6,6 +6,7 @@ module.exports = [
         id: '2fbf6fbf-b3c3-4f59-8d36-7ecb7c8bcf52',
         username: 'admin',
         nickname: '管理员',
+        permissionLevel: 0,
         password: 'ddc1efdd723d48a9cc086ebdba13076b',
         salt: '1abd65ce-8f42-4af6-950d-d4324ef527ba'
     }
