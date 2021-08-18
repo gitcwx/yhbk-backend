@@ -1,6 +1,6 @@
 const router = require('koa-router')()
-const MenuController = require('../server/controllers/menu')
-router.prefix('/api/menu')
+const MenuController = require('../server/controllers/permission')
+router.prefix('/api/permission')
 
 router.post('/list', MenuController.list)
 router.post('/add', MenuController.add)

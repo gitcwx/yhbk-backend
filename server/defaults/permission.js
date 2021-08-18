@@ -42,5 +42,16 @@ module.exports = [
         icon: 'el-icon-document',
         permissionLevel: 9,
         parentMenuId: '9f722f0a-23f3-423d-be43-64e15e3e9ac6'
+    },
+    {
+        createdAt: '2021-08-18 10:47:13',
+        updatedAt: '2021-08-18 10:47:13',
+        id: 'bd24f800-b78d-44e4-ad1f-0ed03f3ff85d',
+        isMenu: false,
+        name: 'password',
+        text: '修改密码',
+        icon: 'el-icon-lock',
+        permissionLevel: 0,
+        parentMenuId: null
     }
 ]

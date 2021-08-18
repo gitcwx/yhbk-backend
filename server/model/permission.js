@@ -1,17 +1,17 @@
 const {
-    menu: Menu
+    permission: Permission
 } = require('../schema')
 
 // 引入默认数据
-const defaultData = require('../defaults/menu')
+const defaultData = require('../defaults/permission')
 
 // 自动创建表 `force: true` 表存在时先删除表
-Menu.sync({ force: true }).then(() => {
+Permission.sync({ force: true }).then(() => {
     // 默认数据写入表
-    return Menu.bulkCreate(defaultData)
+    return Permission.bulkCreate(defaultData)
 })
 
-class MenuModel {
+class PermissionModel {
     // 查询列表
     static async list(params) {
         const {
@@ -23,7 +23,7 @@ class MenuModel {
             permissionLevel
         } = params
 
-        return await Menu.findAndCountAll({
+        return await Permission.findAndCountAll({
             attributes: { exclude: ['deletedAt'] },
             limit,
             offset: (page - 1) * limit,
@@ -43,19 +43,19 @@ class MenuModel {
 
     // 数据插入
     static async add(params) {
-        return await Menu.create(params)
+        return await Permission.create(params)
     }
 
     // 数据编辑
     static async edit(params, conditions) {
-        return await Menu.update(params, {
+        return await Permission.update(params, {
             where: conditions
         })
     }
 
     // 数据删除
     static async del(id) {
-        return await Menu.destroy({
+        return await Permission.destroy({
             where: {
                 id
             }
@@ -64,10 +64,10 @@ class MenuModel {
 
     // 查询是否存在相同数据
     static async isExist(conditions) {
-        return await Menu.findOne({
+        return await Permission.findOne({
             where: conditions
         })
     }
 }
 
-module.exports = MenuModel
+module.exports = PermissionModel

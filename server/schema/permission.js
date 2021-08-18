@@ -1,6 +1,6 @@
 const moment = require('moment')
 module.exports = function (sequelize, DataTypes) {
-    const Menu = sequelize.define('menu', {
+    const Permission = sequelize.define('permission', {
         id: {
             comment: '主键ID',
             type: DataTypes.UUID,
@@ -70,9 +70,9 @@ module.exports = function (sequelize, DataTypes) {
         freezeTableName: true
     })
 
-    Menu.associate = models => {
+    Permission.associate = models => {
 
     }
 
-    return Menu
+    return Permission
 }

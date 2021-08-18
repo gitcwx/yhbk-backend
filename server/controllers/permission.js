@@ -1,37 +1,35 @@
 const {
-    MenuModel,
+    PermissionModel,
     UserModel
 } = require('../model')
 const { throwSuccess, throwError, pagerVerify, paramsVerify } = require('../common/response')
+const jwt = require('jsonwebtoken')
+const { token } = require('../../config')
 
-class MenuController {
+class PermissionController {
     static async list(ctx) {
         try {
             const params = ctx.request.body
+            const auth = ctx.request.headers.authorization.replace('Bearer ', '')
 
             const page = Number(params.page || 1)
             const limit = Number(params.limit || 10)
             const orderby = params.orderby || 'desc'
             const orderName = params.orderName || 'updatedAt'
             const text = params.text || ''
-            const userId = params.userId
 
             // 参数规则检测
-            const errorResponse = pagerVerify(params) || paramsVerify([
-                {
-                    msgLabel: '用户ID',
-                    value: userId,
-                    rules: { required: true }
-                }
-            ])
+            const errorResponse = pagerVerify(params)
             if (errorResponse) {
                 throwError(ctx, 'rules', errorResponse)
                 return
             }
+            const userId = await jwt.verify(auth, token.key).id
+
             // 查询用户的permissionLevel
             const data = await UserModel.info(userId)
 
-            const result = await MenuModel.list({
+            const result = await PermissionModel.list({
                 page,
                 limit,
                 orderby,
@@ -74,7 +72,7 @@ class MenuController {
             }
 
             // 查询是否存在同名菜单
-            const data = await MenuModel.isExist({
+            const data = await PermissionModel.isExist({
                 $or: {
                     name,
                     text
@@ -103,7 +101,7 @@ class MenuController {
             }
 
             // 执行写入
-            await MenuModel.add({
+            await PermissionModel.add({
                 name,
                 text,
                 ...temp
@@ -147,14 +145,14 @@ class MenuController {
             }
 
             // 查询是否存在
-            let data = await MenuModel.isExist({ id })
+            let data = await PermissionModel.isExist({ id })
             if (!data) {
                 throwError(ctx, 'notExist', { msg: '该数据已不存在' })
                 return
             }
 
             // 查询是否存在同名菜单
-            data = await MenuModel.isExist({
+            data = await PermissionModel.isExist({
                 $or: {
                     name,
                     text
@@ -180,7 +178,7 @@ class MenuController {
             }
 
             // 执行写入
-            await MenuModel.edit({
+            await PermissionModel.edit({
                 name,
                 text,
                 ...temp
@@ -210,14 +208,14 @@ class MenuController {
             }
 
             // 查询是否存在
-            const data = await MenuModel.isExist({ id })
+            const data = await PermissionModel.isExist({ id })
             if (!data) {
                 throwError(ctx, 'notExist', { msg: '该数据已不存在' })
                 return
             }
 
             // 执行写入
-            await MenuModel.del(id)
+            await PermissionModel.del(id)
             throwSuccess(ctx, {
                 msg: '删除成功'
             })
@@ -227,4 +225,4 @@ class MenuController {
     }
 }
 
-module.exports = MenuController
+module.exports = PermissionController

@@ -52,21 +52,10 @@ class UserController {
 
     // 用户信息
     static async info(ctx) {
-        const params = ctx.request.body
-        // 参数规则检测
-        const errorResponse = paramsVerify([
-            {
-                msgLabel: 'id',
-                value: params.id,
-                rules: { required: true }
-            }
-        ])
-        if (errorResponse) {
-            throwError(ctx, 'rules', errorResponse)
-            return
-        }
+        const auth = ctx.request.headers.authorization.replace('Bearer ', '')
+        const userId = await jwt.verify(auth, token.key).id
 
-        const data = await UserModel.info(params.id)
+        const data = await UserModel.info(userId)
         if (!data) {
             throwError(ctx, 'notExist', { msg: '该用户不存在' })
             return
@@ -119,7 +108,7 @@ class UserController {
             throwSuccess(ctx, {
                 msg: '登录成功',
                 token: jwt.sign(
-                    { username: data.username, password: data.password, salt: data.salt },
+                    { id: data.id, username: data.username },
                     token.key,
                     { expiresIn: token.expire }
                 )
@@ -175,7 +164,7 @@ class UserController {
                 throwSuccess(ctx, {
                     msg: '注册成功',
                     token: jwt.sign(
-                        { username: data.username, password: data.password, salt: data.salt },
+                        { id: data.id, username: data.username },
                         token.key,
                         { expiresIn: token.expire }
                     )
@@ -198,7 +187,7 @@ class UserController {
             // 参数规则检测
             const errorResponse = paramsVerify([
                 {
-                    msgLabel: 'id',
+                    msgLabel: '用户id',
                     value: params.id,
                     rules: { required: true }
                 },
