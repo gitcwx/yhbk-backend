@@ -36,7 +36,8 @@ module.exports = function (sequelize, DataTypes) {
         parentMenuId: {
             comment: '父级菜单ID',
             type: DataTypes.UUID,
-            allowNull: true
+            allowNull: false,
+            defaultValue: ''
         },
         createdAt: {
             comment: '创建时间',

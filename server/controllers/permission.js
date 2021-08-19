@@ -10,13 +10,13 @@ class PermissionController {
     static async list(ctx) {
         try {
             const params = ctx.request.body
-            const auth = ctx.request.headers.authorization.replace('Bearer ', '')
 
             const page = Number(params.page || 1)
             const limit = Number(params.limit || 10)
             const orderby = params.orderby || 'desc'
-            const orderName = params.orderName || 'updatedAt'
+            const orderName = params.orderName || 'isMenu'
             const text = params.text || ''
+            const isMenu = params.isMenu
 
             // 参数规则检测
             const errorResponse = pagerVerify(params)
@@ -24,10 +24,17 @@ class PermissionController {
                 throwError(ctx, 'rules', errorResponse)
                 return
             }
-            const userId = await jwt.verify(auth, token.key).id
-
-            // 查询用户的permissionLevel
-            const data = await UserModel.info(userId)
+            // 请求来源
+            let permissionLevel = 0
+            if (params.by === 'userId') {
+                const auth = ctx.request.headers.authorization.replace('Bearer ', '')
+                const user = await jwt.verify(auth, token.key)
+                // 查询用户的permissionLevel
+                const data = await UserModel.info(user.id)
+                permissionLevel = data.dataValues.permissionLevel
+            } else {
+                permissionLevel = params.permissionLevel
+            }
 
             const result = await PermissionModel.list({
                 page,
@@ -35,7 +42,9 @@ class PermissionController {
                 orderby,
                 orderName,
                 text,
-                permissionLevel: data.dataValues.permissionLevel
+                isMenu,
+                permissionLevel,
+                by: params.by
             })
             throwSuccess(ctx, {
                 msg: '查询成功',
@@ -72,12 +81,19 @@ class PermissionController {
             }
 
             // 查询是否存在同名菜单
-            const data = await PermissionModel.isExist({
-                $or: {
-                    name,
-                    text
+            let conditions
+            if (name) {
+                conditions = {
+                    $or: {
+                        name,
+                        text
+                    }
                 }
-            })
+            } else {
+                conditions = { text }
+            }
+            const data = await PermissionModel.isExist(conditions)
+
             if (data) {
                 throwError(ctx, 'isExist', { msg: '菜单名称或标识符已存在' })
                 return
@@ -88,7 +104,7 @@ class PermissionController {
                 temp.icon = name
             }
             if (isMenu !== undefined || isMenu !== null) {
-                temp.isMenu = isMenu === 'true'
+                temp.isMenu = isMenu
             }
             if (icon !== undefined || icon !== null) {
                 temp.icon = icon
@@ -150,30 +166,33 @@ class PermissionController {
                 throwError(ctx, 'notExist', { msg: '该数据已不存在' })
                 return
             }
-
-            // 查询是否存在同名菜单
-            data = await PermissionModel.isExist({
-                $or: {
-                    name,
-                    text
-                }
-            })
-            if (data) {
-                throwError(ctx, 'isExist', { msg: '菜单名称或标识符已存在' })
-                return
-            }
-
             const temp = {}
-            if (isMenu !== undefined || isMenu !== null) {
-                temp.isMenu = isMenu === 'true'
+
+            if (name || text) {
+                // 查询是否存在同名菜单
+                data = await PermissionModel.isExist({
+                    $or: {
+                        name,
+                        text
+                    }
+                })
+                if (data) {
+                    throwError(ctx, 'isExist', { msg: '菜单名称或标识符已存在' })
+                    return
+                }
             }
-            if (icon !== undefined || icon !== null) {
+
+            if (isMenu !== undefined && isMenu !== null) {
+                temp.isMenu = isMenu
+            }
+
+            if (icon !== undefined && icon !== null) {
                 temp.icon = icon
             }
-            if (permissionLevel !== undefined || permissionLevel !== null) {
+            if (permissionLevel !== undefined && permissionLevel !== null) {
                 temp.permissionLevel = permissionLevel
             }
-            if (parentMenuId !== undefined || parentMenuId !== null) {
+            if (parentMenuId !== undefined && parentMenuId !== null) {
                 temp.parentMenuId = parentMenuId
             }
 

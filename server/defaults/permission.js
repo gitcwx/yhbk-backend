@@ -1,57 +1,46 @@
 module.exports = [
     {
-        createdAt: '2021-08-16 16:23:35',
-        updatedAt: '2021-08-16 16:23:35',
-        id: '89824cc3-10fd-4bb0-b3e4-3259c3345e67',
+        createdAt: '2021-08-19 17:36:37',
+        updatedAt: '2021-08-19 17:36:37',
+        id: 'b36cde97-481d-4997-881e-676ad582977e',
         isMenu: true,
         name: 'dashboard',
-        text: '系统首页',
+        text: '控制台',
         icon: 'el-icon-s-home',
-        permissionLevel: 0,
-        parentMenuId: null
+        permissionLevel: 9,
+        parentMenuId: ''
     },
     {
-        createdAt: '2021-08-16 16:25:12',
-        updatedAt: '2021-08-16 16:25:12',
-        id: 'bca8bdc5-9955-4112-bfcd-09ece83f3194',
-        isMenu: true,
-        name: 'message',
-        text: '系统消息',
-        icon: 'el-icon-message',
-        permissionLevel: 1,
-        parentMenuId: null
-    },
-    {
-        createdAt: '2021-08-16 16:45:32',
-        updatedAt: '2021-08-16 16:45:32',
-        id: '9f722f0a-23f3-423d-be43-64e15e3e9ac6',
+        createdAt: '2021-08-19 17:50:49',
+        updatedAt: '2021-08-19 17:50:53',
+        id: '5742fa2a-1340-4d93-8cc1-2fc2f9dffb76',
         isMenu: true,
         name: '',
         text: '个人中心',
-        icon: 'el-icon-user',
+        icon: 'el-icon-user-solid',
         permissionLevel: 2,
-        parentMenuId: null
+        parentMenuId: ''
     },
     {
-        createdAt: '2021-08-16 16:46:28',
-        updatedAt: '2021-08-16 16:46:28',
-        id: '1675c3e1-115e-452a-8252-a3c40ff8b286',
+        createdAt: '2021-08-19 17:51:37',
+        updatedAt: '2021-08-19 17:51:37',
+        id: 'f49abc4b-d9cc-43b9-a721-5eabb4004e2b',
         isMenu: true,
-        name: 'userInfo',
-        text: '用户资料',
-        icon: 'el-icon-document',
-        permissionLevel: 9,
-        parentMenuId: '9f722f0a-23f3-423d-be43-64e15e3e9ac6'
-    },
-    {
-        createdAt: '2021-08-18 10:47:13',
-        updatedAt: '2021-08-18 10:47:13',
-        id: 'bd24f800-b78d-44e4-ad1f-0ed03f3ff85d',
-        isMenu: false,
         name: 'password',
         text: '修改密码',
         icon: 'el-icon-lock',
+        permissionLevel: 2,
+        parentMenuId: '5742fa2a-1340-4d93-8cc1-2fc2f9dffb76'
+    },
+    {
+        createdAt: '2021-08-20 16:23:35',
+        updatedAt: '2021-08-20 16:23:35',
+        id: '89824cc3-10fd-4bb0-b3e4-3259c3345e68',
+        isMenu: true,
+        name: 'permission',
+        text: '权限控制',
+        icon: 'el-icon-set-up',
         permissionLevel: 0,
-        parentMenuId: null
+        parentMenuId: ''
     }
 ]

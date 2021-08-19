@@ -20,9 +20,29 @@ class PermissionModel {
             orderby,
             orderName,
             text,
-            permissionLevel
+            isMenu,
+            permissionLevel,
+            by
         } = params
 
+        let menu = {}
+        if (typeof isMenu === 'boolean') {
+            menu = {
+                isMenu
+            }
+        }
+        let level = {}
+        if (typeof permissionLevel === 'number') {
+            if (by === 'userId') {
+                level = {
+                    permissionLevel: {
+                        $gte: permissionLevel
+                    }
+                }
+            } else {
+                level = { permissionLevel }
+            }
+        }
         return await Permission.findAndCountAll({
             attributes: { exclude: ['deletedAt'] },
             limit,
@@ -31,12 +51,12 @@ class PermissionModel {
                 text: {
                     $like: `%${text}%`
                 },
-                permissionLevel: {
-                    $gte: permissionLevel
-                }
+                ...level,
+                ...menu
             },
             order: [
-                [orderName, orderby]
+                [orderName, orderby],
+                ['createdAt', 'asc']
             ]
         })
     }
