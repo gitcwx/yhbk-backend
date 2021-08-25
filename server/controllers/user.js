@@ -2,7 +2,7 @@ const {
     UserModel,
     ArticleModel
 } = require('../model')
-const { throwSuccess, throwError, pagerVerify, paramsVerify } = require('../common/response')
+const { throwSuccess, throwError, pagerVerify, paramsVerify, hasValue } = require('../common/response')
 // 引入md5加密方法
 const { MD5 } = require('../../util/encrypt')
 // token
@@ -12,33 +12,55 @@ class UserController {
     // 用户列表
     static async list(ctx) {
         try {
-            const params = ctx.request.body
-
-            const page = Number(params.page || 1)
-            const limit = Number(params.limit || 10)
-            const orderby = params.orderby || 'desc'
-            const orderName = params.orderName || 'updatedAt'
-            const nickname = params.nickname || ''
-            const gender = params.gender || ''
-            const status = params.status || ''
-            const loginFrom = params.loginFrom || ''
-
-            // 参数规则检测
-            const errorResponse = pagerVerify(params)
-            if (errorResponse) {
-                throwError(ctx, 'rules', errorResponse)
-                return
-            }
-
-            const result = await UserModel.list({
+            const {
                 page,
                 limit,
                 orderby,
                 orderName,
+                username,
                 nickname,
                 gender,
                 status,
-                loginFrom
+                loginFrom,
+                permissionLevel
+            } = ctx.request.body
+            // 参数规则检测
+            const errorResponse = pagerVerify(ctx.request.body)
+            if (errorResponse) {
+                throwError(ctx, 'rules', errorResponse)
+                return
+            }
+            // 查询条件参数过滤
+            const conditions = {}
+            if (hasValue(username)) {
+                conditions.username = {
+                    $like: `%${username}%`
+                }
+            }
+            if (hasValue(nickname)) {
+                conditions.nickname = {
+                    $like: `%${nickname}%`
+                }
+            }
+            if (hasValue(gender)) {
+                conditions.gender = gender
+            }
+            if (hasValue(status)) {
+                conditions.status = status
+            }
+            if (hasValue(loginFrom)) {
+                conditions.loginFrom = loginFrom
+            }
+            if (hasValue(permissionLevel)) {
+                conditions.permissionLevel = permissionLevel
+            }
+
+            const result = await UserModel.list({
+                page: Number(page || 1),
+                limit: Number(limit || 10),
+                orderby: orderby || 'desc',
+                orderName: orderName || 'updatedAt',
+                conditions
             })
             throwSuccess(ctx, {
                 msg: '查询成功',
@@ -52,8 +74,14 @@ class UserController {
 
     // 用户信息
     static async info(ctx) {
-        const auth = ctx.request.headers.authorization.replace('Bearer ', '')
-        const userId = await jwt.verify(auth, token.key).id
+        const params = ctx.request.body
+        let userId
+        if (params.id) {
+            userId = params.id
+        } else {
+            const auth = ctx.request.headers.authorization.replace('Bearer ', '')
+            userId = await jwt.verify(auth, token.key).id
+        }
 
         const data = await UserModel.info(userId)
         if (!data) {
@@ -78,12 +106,12 @@ class UserController {
                 {
                     msgLabel: '用户名',
                     value: params.username,
-                    rules: { required: true }
+                    rules: { required: true, reg: /^[\u4e00-\u9fa5a-zA-Z0-9_]{4,16}$/ }
                 },
                 {
                     msgLabel: '密码',
                     value: params.password,
-                    rules: { required: true }
+                    rules: { required: true, reg: /^[a-zA-Z0-9~!@#$%^&*()+=|{}\-_]{4,16}$/ }
                 }
             ])
             if (errorResponse) {

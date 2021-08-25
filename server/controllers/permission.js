@@ -168,7 +168,10 @@ class PermissionController {
             }
             const temp = {}
 
-            if (name || text) {
+            if (
+                (name && name !== data.name) ||
+                (text && text !== data.text)
+            ) {
                 // 查询是否存在同名菜单
                 data = await PermissionModel.isExist({
                     $or: {

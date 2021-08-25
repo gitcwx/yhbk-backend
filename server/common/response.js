@@ -100,7 +100,7 @@ const pagerVerify = (params) => {
         return { code: 'e03', msg: '排序规则不合规' }
     }
 
-    // 判断排序字段是否为表中字段
+    // todo 判断排序字段是否为表中字段
 
     return undefined
 }
@@ -141,9 +141,15 @@ const paramsVerify = (data) => {
 
     return result
 }
+const hasValue = (value) => {
+    // true: 0 false other
+    // false: undefined null String()
+    return value !== undefined && value !== null && value !== ''
+}
 module.exports = {
     throwSuccess,
     throwError,
     pagerVerify,
-    paramsVerify
+    paramsVerify,
+    hasValue
 }

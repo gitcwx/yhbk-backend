@@ -22,21 +22,8 @@ class UserModel {
             limit,
             orderby,
             orderName,
-            nickname,
-            gender,
-            status,
-            loginFrom
+            conditions
         } = params
-
-        const conditions = {}
-        if (nickname) {
-            conditions.nickname = {
-                $like: `%${nickname}%`
-            }
-        }
-        if (gender) { conditions.gender = gender }
-        if (status) { conditions.status = status }
-        if (loginFrom) { conditions.loginFrom = loginFrom }
 
         return await User.findAndCountAll({
             attributes: { exclude: ['salt', 'password', 'ip', 'authKey', 'deletedAt'] },

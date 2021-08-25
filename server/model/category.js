@@ -68,15 +68,7 @@ class CategoryModel {
     }
 
     // 查询是否存在相同数据
-    static async isExist(params) {
-        const conditions = {}
-        if (params.id) {
-            conditions.id = params.id
-        }
-        if (params.name) {
-            conditions.name = params.name
-        }
-
+    static async isExist(conditions) {
         return await Category.findOne({
             where: conditions
         })
