@@ -141,15 +141,23 @@ const paramsVerify = (data) => {
 
     return result
 }
-const hasValue = (value) => {
-    // true: 0 false other
-    // false: undefined null String()
-    return value !== undefined && value !== null && value !== ''
+
+// 处理前端参数，过滤空参数，参数转换查询条件
+const filterEmptyAway = (list) => {
+    const params = {}
+    list.forEach(item => {
+        if (item.value === undefined) { return }
+        if (item.value === null) { return }
+        if (item.value === '') { return }
+
+        params[item.label] = item.rewrite || item.value
+    })
+    return params
 }
 module.exports = {
     throwSuccess,
     throwError,
     pagerVerify,
     paramsVerify,
-    hasValue
+    filterEmptyAway
 }

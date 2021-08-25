@@ -2,7 +2,7 @@ const {
     UserModel,
     ArticleModel
 } = require('../model')
-const { throwSuccess, throwError, pagerVerify, paramsVerify, hasValue } = require('../common/response')
+const { throwSuccess, throwError, pagerVerify, paramsVerify, filterEmptyAway } = require('../common/response')
 // 引入md5加密方法
 const { MD5 } = require('../../util/encrypt')
 // token
@@ -31,29 +31,26 @@ class UserController {
                 return
             }
             // 查询条件参数过滤
-            const conditions = {}
-            if (hasValue(username)) {
-                conditions.username = {
-                    $like: `%${username}%`
-                }
-            }
-            if (hasValue(nickname)) {
-                conditions.nickname = {
-                    $like: `%${nickname}%`
-                }
-            }
-            if (hasValue(gender)) {
-                conditions.gender = gender
-            }
-            if (hasValue(status)) {
-                conditions.status = status
-            }
-            if (hasValue(loginFrom)) {
-                conditions.loginFrom = loginFrom
-            }
-            if (hasValue(permissionLevel)) {
-                conditions.permissionLevel = permissionLevel
-            }
+            const conditions = filterEmptyAway([
+                {
+                    label: 'username',
+                    value: username,
+                    rewrite: {
+                        $like: `%${username}%`
+                    }
+                },
+                {
+                    label: 'nickname',
+                    value: nickname,
+                    rewrite: {
+                        $like: `%${nickname}%`
+                    }
+                },
+                { label: 'gender', value: gender },
+                { label: 'status', value: status },
+                { label: 'loginFrom', value: loginFrom },
+                { label: 'permissionLevel', value: permissionLevel }
+            ])
 
             const result = await UserModel.list({
                 page: Number(page || 1),
@@ -330,16 +327,19 @@ class UserController {
                 return
             }
 
+            // 获取有效参数
+            const params = filterEmptyAway([
+                { label: 'nickname', value: nickname },
+                { label: 'birth', value: birth },
+                { label: 'gender', value: gender },
+                { label: 'location', value: location },
+                { label: 'email', value: email },
+                { label: 'phone', value: phone },
+                { label: 'status', value: status }
+            ])
+
             // 执行写入
-            await UserModel.edit({
-                nickname,
-                birth,
-                gender,
-                location,
-                email,
-                phone,
-                status
-            }, {
+            await UserModel.edit(params, {
                 id
             })
             // 获取用户更新后的信息
