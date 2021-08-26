@@ -1,6 +1,4 @@
-const {
-    permission: Permission
-} = require('../schema')
+const { permission: Permission } = require('../schema')
 
 // 引入默认数据
 const defaultData = require('../defaults/permission')
@@ -19,41 +17,14 @@ class PermissionModel {
             limit,
             orderby,
             orderName,
-            text,
-            isMenu,
-            permissionLevel,
-            by
+            conditions
         } = params
 
-        let menu = {}
-        if (typeof isMenu === 'boolean') {
-            menu = {
-                isMenu
-            }
-        }
-        let level = {}
-        if (typeof permissionLevel === 'number') {
-            if (by === 'userId') {
-                level = {
-                    permissionLevel: {
-                        $gte: permissionLevel
-                    }
-                }
-            } else {
-                level = { permissionLevel }
-            }
-        }
         return await Permission.findAndCountAll({
             attributes: { exclude: ['deletedAt'] },
             limit,
             offset: (page - 1) * limit,
-            where: {
-                text: {
-                    $like: `%${text}%`
-                },
-                ...level,
-                ...menu
-            },
+            where: conditions,
             order: [
                 [orderName, orderby],
                 ['createdAt', 'asc']

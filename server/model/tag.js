@@ -20,18 +20,14 @@ class TagModel {
             limit,
             orderby,
             orderName,
-            name
+            conditions
         } = params
 
         return await Tag.findAndCountAll({
             attributes: { exclude: ['deletedAt'] },
             limit,
             offset: (page - 1) * limit,
-            where: {
-                name: {
-                    $like: `%${name}%`
-                }
-            },
+            where: conditions,
             order: [
                 [orderName, orderby]
             ]

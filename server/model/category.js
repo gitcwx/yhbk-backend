@@ -46,15 +46,9 @@ class CategoryModel {
     }
 
     // 数据编辑
-    static async edit(params, categoryId) {
-        const data = {}
-        if (params.name) {
-            data.name = params.name
-        }
-        return await Category.update(data, {
-            where: {
-                id: categoryId
-            }
+    static async edit(params, conditions) {
+        return await Category.update(params, {
+            where: conditions
         })
     }
 

@@ -1,32 +1,29 @@
-const {
-    TagModel
-} = require('../model')
-const { throwSuccess, throwError, pagerVerify, paramsVerify } = require('../common/response')
+const { TagModel } = require('../model')
+const { throwSuccess, throwError, checkPageAndRewrite, checkRuleAndfilterEmpty } = require('../common/response')
 
 class TagController {
     static async list(ctx) {
         try {
-            const params = ctx.request.body
-
-            const page = Number(params.page || 1)
-            const limit = Number(params.limit || 10)
-            const orderby = params.orderby || 'desc'
-            const orderName = params.orderName || 'updatedAt'
-            const name = params.name || ''
+            const { name } = ctx.request.body
 
             // 参数规则检测
-            const errorResponse = pagerVerify(params)
-            if (errorResponse) {
-                throwError(ctx, 'rules', errorResponse)
+            const checkPage = checkPageAndRewrite(
+                ctx.request.body,
+                ['name', 'updatedAt'] // can order list
+            )
+            if (checkPage.mistake) {
+                throwError(ctx, 'rules', checkPage.mistake)
                 return
             }
 
+            // 查询条件参数过滤重组
+            const checkParams = checkRuleAndfilterEmpty([
+                { rename: 'name', value: name, rewrite: { $like: `%${name}%` } }
+            ])
+
             const result = await TagModel.list({
-                page,
-                limit,
-                orderby,
-                orderName,
-                name
+                ...checkPage.data,
+                conditions: checkParams.data
             })
             throwSuccess(ctx, {
                 msg: '查询成功',
@@ -40,32 +37,26 @@ class TagController {
 
     static async add(ctx) {
         try {
-            const params = ctx.request.body
+            const { name } = ctx.request.body
 
-            // 参数规则检测
-            const errorResponse = paramsVerify([
-                {
-                    msgLabel: '标签名',
-                    value: params.name,
-                    rules: { required: true, max: 10 }
-                }
+            // 查询条件参数过滤重组
+            const checkParams = checkRuleAndfilterEmpty([
+                { label: '标签名', value: name, rules: { required: true, max: 10 } }
             ])
-            if (errorResponse) {
-                throwError(ctx, 'rules', errorResponse)
+            if (checkParams.mistake) {
+                throwError(ctx, 'rules', checkParams.mistake)
                 return
             }
 
             // 查询是否存在同名标签
-            const data = await TagModel.isExist({
-                name: params.name
-            })
+            const data = await TagModel.isExist({ name })
             if (data) {
-                throwError(ctx, 'isExist', { msg: params.name + '已存在' })
+                throwError(ctx, 'isExist', { msg: name + '已存在' })
                 return
             }
 
             // 执行写入
-            await TagModel.add({ name: params.name })
+            await TagModel.add({ name })
             throwSuccess(ctx, {
                 msg: '添加成功'
             })
@@ -82,20 +73,12 @@ class TagController {
             } = ctx.request.body
 
             // 参数规则检测
-            const errorResponse = paramsVerify([
-                {
-                    msgLabel: 'id',
-                    value: id,
-                    rules: { required: true }
-                },
-                {
-                    msgLabel: '标签名',
-                    value: name,
-                    rules: { required: true, max: 10 }
-                }
+            const checkParams = checkRuleAndfilterEmpty([
+                { label: 'id', value: id, rules: { required: true } },
+                { label: '标签名', value: name, rules: { required: true, max: 10 } }
             ])
-            if (errorResponse) {
-                throwError(ctx, 'rules', errorResponse)
+            if (checkParams.mistake) {
+                throwError(ctx, 'rules', checkParams.mistake)
                 return
             }
 
@@ -132,11 +115,11 @@ class TagController {
             const { id } = ctx.request.body
 
             // 参数规则检测
-            const errorResponse = paramsVerify([
-                { msgLabel: 'id', value: id, rules: { required: true } }
+            const checkParams = checkRuleAndfilterEmpty([
+                { label: 'id', value: id, rules: { required: true } }
             ])
-            if (errorResponse) {
-                throwError(ctx, 'rules', errorResponse)
+            if (checkParams.mistake) {
+                throwError(ctx, 'rules', checkParams.mistake)
                 return
             }
 

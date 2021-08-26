@@ -18,35 +18,10 @@ class ArticleModel {
             page,
             limit,
             orderby,
-            orderName
+            orderName,
+            conditions
         } = params
 
-        const conditions = {}
-        if (params.keyword) {
-            conditions.$or = {
-                title: {
-                    $like: `%${params.keyword}%`
-                },
-                abstract: {
-                    $like: `%${params.keyword}%`
-                }
-                // content已经转base64 暂时无法查找
-            }
-        }
-        if (params.isTop !== undefined) {
-            conditions.isTop = params.isTop === 'true'
-        }
-        if (params.status) {
-            conditions.status = params.status
-        }
-        if (params.categoryId) {
-            conditions.categoryId = params.categoryId
-        }
-        if (params.tagIds) {
-            conditions.tagIds = {
-                $regexp: params.tagIds.replace(/,/g, '|')
-            }
-        }
         return await Article.findAndCountAll({
             attributes: {
                 exclude: ['deletedAt', 'content']

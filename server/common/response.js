@@ -11,13 +11,13 @@ const status = {
 // 业务相应码
 // eslint-disable-next-line no-unused-vars
 const codes = {
-    '00': '成功',
+    s00: '成功',
 
     // 表格 页码 排序等规则判断
     e01: '页码不合规',
     e02: '每页显示条数不合规',
     e03: '排序规则不合规',
-    e04: '排序字段不存在',
+    e04: '排序字段不合规',
 
     // 输入
     e11: '不可为空',
@@ -37,7 +37,7 @@ const codes = {
 const throwSuccess = (ctx, params) => {
     ctx.response.status = 200
     ctx.body = {
-        code: '00',
+        code: 's00',
         ...params
     }
 }
@@ -55,6 +55,8 @@ const throwError = (ctx, type, params) => {
     case 'notExist': result = { status: 200, code: 'e22', msg: params.msg }; break
     // 数据不匹配
     case 'notMatch': result = { status: 200, code: 'e23', msg: params.msg }; break
+    // 无权修改
+    case 'forbidden': result = { status: 200, code: 'e24', msg: params.msg }; break
 
     // token认证失败
     case 401: result = { status: 401, code: 'e81', msg: 'token认证失败' }; break
@@ -72,92 +74,109 @@ const throwError = (ctx, type, params) => {
     }
 }
 
-const pagerVerify = (params) => {
+// 校验并重组分页相关参数
+const checkPageAndRewrite = (params, orderKeys) => {
+    let mistake
+    const data = {}
     // 判断页码 page
     if (
-        // false [null, 0, NaN, -Number]
-        // true  [undefined, '', +inter]
-        params.page !== undefined && !/^$|^[1-9]\d{0,2}$/.test(params.page)
+        hasValue(params.page) &&
+        !/^[1-9]\d{0,2}$/.test(params.page)
     ) {
-        return { code: 'e01', msg: '页码不合规' }
+        mistake = { code: 'e01', msg: '页码不合规' }
     }
-
     // 判断每页条数 limit
     if (
-        // false [null, 0, NaN, -Number]
-        // true  [undefined, '', +inter]
-        params.limit !== undefined && !/^$|^[1-9]\d{0,2}$/.test(params.limit)
+        hasValue(params.limit) &&
+        !/^[1-9]\d{0,2}$/.test(params.limit)
     ) {
-        return { code: 'e02', msg: '每页显示条数不合规' }
+        mistake = { code: 'e02', msg: '每页显示条数不合规' }
     }
-
     // 判断排序规则
     if (
-        // false  [other]
-        // true   [undefined, '', 'asc'/i, 'desc'/i]
-        params.orderby !== undefined && !/^$|^(de|a)sc$/i.test(params.orderby)
+        hasValue(params.orderby) &&
+        !/^(de|a)sc$/i.test(params.orderby)
     ) {
-        return { code: 'e03', msg: '排序规则不合规' }
+        mistake = { code: 'e03', msg: '排序规则不合规' }
+    }
+    // 判断排序字段是否可用
+    if (
+        hasValue(params.orderName) &&
+        orderKeys.indexOf(params.orderName) === -1
+    ) {
+        mistake = { code: 'e04', msg: '排序字段不合规' }
     }
 
-    // todo 判断排序字段是否为表中字段
+    // 参数重组
+    data.page = params.page || 1
+    data.limit = params.limit || 10
+    data.orderby = params.orderby ? params.orderby.toLowerCase() : 'desc'
+    data.orderName = params.orderName || 'updatedAt'
 
-    return undefined
+    return {
+        mistake,
+        data
+    }
 }
-const paramsVerify = (data) => {
-    let result
-    for (let i = 0; i < data.length; i++) {
-        const msgLabel = data[i].msgLabel
-        const value = data[i].value
-        const rules = data[i].rules
+// 校验并重组其他参数
+const checkRuleAndfilterEmpty = (params) => {
+    let mistake
+    // 重组参数 [查询条件 | 存库字段]
+    const data = {}
+    for (let i = 0; i < params.length; i++) {
+        const {
+            // 规则验证参数
+            label,
+            value,
+            rules,
+            // [ 重组参数 ]
+            rename,
+            rewrite
+        } = params[i]
 
-        // 判断非空
-        if (
-            rules.required && !value
-        ) {
-            result = { code: 'e11', msg: `${msgLabel}不可为空` }
-            break
+        // 判断是否空值
+        if (value === undefined || value === null || value === '') {
+            if (rules.required) {
+                mistake = { code: 'e11', msg: `${label}不可为空` }
+                // 中断循环，抛出错误
+                break
+            }
+            // 此次执行停止，进入下一循环
+            return
         }
-
         // 判断字符长度
         if (
-            value !== undefined && (
-                (rules.max && value.length > rules.max) ||
-                (rules.min && value.length < rules.min)
-            )
+            (rules.max && value.length > rules.max) ||
+            (rules.min && value.length < rules.min)
         ) {
-            result = { code: 'e12', msg: `${msgLabel}长度不合规` }
+            mistake = { code: 'e12', msg: `${label}长度不合规` }
             break
         }
-
         // 正则判断
         if (
-            rules.reg && !!value && !rules.reg.test(value)
+            rules.reg && !rules.reg.test(value)
         ) {
-            result = { code: 'e13', msg: `${msgLabel}格式不合规` }
+            mistake = { code: 'e13', msg: `${label}格式不合规` }
             break
+        }
+        // 值重组
+        if (rename) {
+            data[rename] = rewrite || value
         }
     }
 
-    return result
+    return { mistake, data }
 }
 
-// 处理前端参数，过滤空参数，参数转换查询条件
-const filterEmptyAway = (list) => {
-    const params = {}
-    list.forEach(item => {
-        if (item.value === undefined) { return }
-        if (item.value === null) { return }
-        if (item.value === '') { return }
-
-        params[item.label] = item.rewrite || item.value
-    })
-    return params
+const hasValue = (value) => {
+    // false: undefined null String()
+    // true: 0 false other
+    return value !== undefined && value !== null && value !== ''
 }
+
 module.exports = {
     throwSuccess,
     throwError,
-    pagerVerify,
-    paramsVerify,
-    filterEmptyAway
+    checkPageAndRewrite,
+    checkRuleAndfilterEmpty
 }

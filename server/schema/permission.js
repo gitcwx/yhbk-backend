@@ -20,7 +20,8 @@ module.exports = function (sequelize, DataTypes) {
         },
         text: {
             comment: '菜单名称',
-            type: DataTypes.STRING
+            type: DataTypes.STRING,
+            allowNull: false
         },
         icon: {
             comment: '菜单图标',

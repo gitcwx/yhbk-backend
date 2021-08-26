@@ -1,33 +1,28 @@
-const {
-    CategoryModel,
-    ArticleModel
-} = require('../model')
-const { throwSuccess, throwError, pagerVerify, paramsVerify } = require('../common/response')
+const { CategoryModel, ArticleModel } = require('../model')
+const { throwSuccess, throwError, checkPageAndRewrite, checkRuleAndfilterEmpty } = require('../common/response')
 
 class CategoryController {
     static async list(ctx) {
         try {
-            const params = ctx.request.body
-
-            const page = Number(params.page || 1)
-            const limit = Number(params.limit || 10)
-            const orderby = params.orderby || 'desc'
-            const orderName = params.orderName || 'updatedAt'
-            const name = params.name || ''
+            const { name } = ctx.request.body
 
             // 参数规则检测
-            const errorResponse = pagerVerify(params)
-            if (errorResponse) {
-                throwError(ctx, 'rules', errorResponse)
+            const checkPage = checkPageAndRewrite(
+                ctx.request.body,
+                ['name', 'updatedAt'] // can order list
+            )
+            if (checkPage.mistake) {
+                throwError(ctx, 'rules', checkPage.mistake)
                 return
             }
+            // 查询条件参数过滤重组
+            const checkParams = checkRuleAndfilterEmpty([
+                { rename: 'name', value: name, rewrite: { $like: `%${name}%` } }
+            ])
 
             const result = await CategoryModel.list({
-                page,
-                limit,
-                orderby,
-                orderName,
-                name
+                ...checkPage.data,
+                conditions: checkParams.data
             })
             throwSuccess(ctx, {
                 msg: '查询成功',
@@ -41,32 +36,26 @@ class CategoryController {
 
     static async add(ctx) {
         try {
-            const params = ctx.request.body
+            const { name } = ctx.request.body
 
-            // 参数规则检测
-            const errorResponse = paramsVerify([
-                {
-                    msgLabel: '分类名',
-                    value: params.name,
-                    rules: { required: true, max: 10 }
-                }
+            // 查询条件参数过滤重组
+            const checkParams = checkRuleAndfilterEmpty([
+                { label: '分类名', value: name, rules: { required: true, max: 10 } }
             ])
-            if (errorResponse) {
-                throwError(ctx, 'rules', errorResponse)
+            if (checkParams.mistake) {
+                throwError(ctx, 'rules', checkParams.mistake)
                 return
             }
 
             // 查询是否存在同名分类
-            const data = await CategoryModel.isExist({
-                name: params.name
-            })
+            const data = await CategoryModel.isExist({ name })
             if (data) {
-                throwError(ctx, 'isExist', { msg: params.name + '已存在' })
+                throwError(ctx, 'isExist', { msg: name + '已存在' })
                 return
             }
 
             // 执行写入
-            await CategoryModel.add(params)
+            await CategoryModel.add({ name })
             throwSuccess(ctx, {
                 msg: '添加成功'
             })
@@ -83,20 +72,12 @@ class CategoryController {
             } = ctx.request.body
 
             // 参数规则检测
-            const errorResponse = paramsVerify([
-                {
-                    msgLabel: 'id',
-                    value: id,
-                    rules: { required: true }
-                },
-                {
-                    msgLabel: '分类名',
-                    value: name,
-                    rules: { required: true, max: 10 }
-                }
+            const checkParams = checkRuleAndfilterEmpty([
+                { label: 'id', value: id, rules: { required: true } },
+                { label: '分类名', value: name, rules: { required: true, max: 10 } }
             ])
-            if (errorResponse) {
-                throwError(ctx, 'rules', errorResponse)
+            if (checkParams.mistake) {
+                throwError(ctx, 'rules', checkParams.mistake)
                 return
             }
 
@@ -117,7 +98,9 @@ class CategoryController {
             // 执行写入
             await CategoryModel.edit({
                 name
-            }, id)
+            }, {
+                id
+            })
 
             // 更新文章
             await ArticleModel.edit({
@@ -138,11 +121,11 @@ class CategoryController {
             const { id } = ctx.request.body
 
             // 参数规则检测
-            const errorResponse = paramsVerify([
-                { msgLabel: 'id', value: id, rules: { required: true } }
+            const checkParams = checkRuleAndfilterEmpty([
+                { label: 'id', value: id, rules: { required: true } }
             ])
-            if (errorResponse) {
-                throwError(ctx, 'rules', errorResponse)
+            if (checkParams.mistake) {
+                throwError(ctx, 'rules', checkParams.mistake)
                 return
             }
 

@@ -1,7 +1,4 @@
-const {
-    user: User
-    // sequelize
-} = require('../schema')
+const { user: User } = require('../schema')
 // 引入md5加密方法
 const { UUID, MD5 } = require('../../util/encrypt')
 
@@ -68,14 +65,14 @@ class UserModel {
 
         return await User.create({
             username: params.username,
-            nickname: params.username,
+            nickname: params.nickname || params.username,
             password,
             salt
         })
     }
 
     // 修改密码
-    static async password(params) {
+    static async password(params, conditions) {
         const salt = UUID()
         const password = await MD5(params.newPassword, salt)
 
@@ -83,17 +80,14 @@ class UserModel {
             salt,
             password
         }, {
-            where: {
-                id: params.id
-            }
+            where: conditions
         })
     }
 
     // 数据编辑
     static async edit(params, conditions) {
         return await User.update(params, {
-            where: conditions,
-            returning: true
+            where: conditions
         })
     }
 

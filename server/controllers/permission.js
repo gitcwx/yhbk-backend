@@ -1,50 +1,54 @@
-const {
-    PermissionModel,
-    UserModel
-} = require('../model')
-const { throwSuccess, throwError, pagerVerify, paramsVerify } = require('../common/response')
+const { PermissionModel, UserModel } = require('../model')
+const { throwSuccess, throwError, checkPageAndRewrite, checkRuleAndfilterEmpty } = require('../common/response')
 const jwt = require('jsonwebtoken')
 const { token } = require('../../config')
 
 class PermissionController {
     static async list(ctx) {
         try {
-            const params = ctx.request.body
-
-            const page = Number(params.page || 1)
-            const limit = Number(params.limit || 10)
-            const orderby = params.orderby || 'desc'
-            const orderName = params.orderName || 'isMenu'
-            const text = params.text || ''
-            const isMenu = params.isMenu
+            const {
+                text,
+                isMenu,
+                by,
+                permissionLevel
+            } = ctx.request.body
 
             // 参数规则检测
-            const errorResponse = pagerVerify(params)
-            if (errorResponse) {
-                throwError(ctx, 'rules', errorResponse)
+            const checkPage = checkPageAndRewrite(
+                ctx.request.body,
+                ['text', 'name', 'isMenu', 'permissionLevel', 'updatedAt'] // can order list
+            )
+            if (checkPage.mistake) {
+                throwError(ctx, 'rules', checkPage.mistake)
                 return
             }
+
+            // 查询条件参数过滤重组
+            const checkList = [
+                { rename: 'text', value: text, rewrite: { $like: `%${text}%` } },
+                { rename: 'isMenu', value: isMenu }
+            ]
+
             // 请求来源
-            let permissionLevel = 0
-            if (params.by === 'userId') {
+            if (by === 'userId') {
                 const auth = ctx.request.headers.authorization.replace('Bearer ', '')
                 const user = await jwt.verify(auth, token.key)
                 // 查询用户的permissionLevel
-                const data = await UserModel.info(user.id)
-                permissionLevel = data.dataValues.permissionLevel
+                const level = await UserModel.info(user.id).dataValues.permissionLevel
+                checkList.push({
+                    rename: 'permissionLevel', value: level, rewrite: { $gte: level }
+                })
             } else {
-                permissionLevel = params.permissionLevel
+                checkList.push({
+                    rename: 'permissionLevel', value: permissionLevel
+                })
             }
 
+            const checkParams = checkRuleAndfilterEmpty(checkList)
+
             const result = await PermissionModel.list({
-                page,
-                limit,
-                orderby,
-                orderName,
-                text,
-                isMenu,
-                permissionLevel,
-                by: params.by
+                ...checkPage.data,
+                conditions: checkParams.data
             })
             throwSuccess(ctx, {
                 msg: '查询成功',
@@ -59,24 +63,25 @@ class PermissionController {
     static async add(ctx) {
         try {
             const {
-                name,
                 text,
+                permissionLevel,
+                name,
                 isMenu,
                 icon,
-                permissionLevel,
                 parentMenuId
             } = ctx.request.body
 
-            // 参数规则检测
-            const errorResponse = paramsVerify([
-                {
-                    msgLabel: '菜单名称',
-                    value: text,
-                    rules: { max: 10 }
-                }
+            // 查询条件参数过滤重组
+            const checkParams = checkRuleAndfilterEmpty([
+                { rename: 'text', label: '菜单名称', value: text, rules: { required: true, max: 10 } },
+                { rename: 'permissionLevel', label: '菜单权限', value: permissionLevel, rules: { required: true, reg: /^\d$/ } },
+                { rename: 'name', label: '菜单路由', value: name, rules: { reg: /^[a-zA-z]{1,10}$/ } },
+                { rename: 'isMenu', label: '展示到菜单栏', value: isMenu, rules: { reg: /^(false|true)$/ } },
+                { rename: 'icon', value: icon },
+                { rename: 'parentMenuId', value: parentMenuId }
             ])
-            if (errorResponse) {
-                throwError(ctx, 'rules', errorResponse)
+            if (checkParams.mistake) {
+                throwError(ctx, 'rules', checkParams.mistake)
                 return
             }
 
@@ -99,29 +104,8 @@ class PermissionController {
                 return
             }
 
-            const temp = {}
-            if (name !== undefined || name !== null) {
-                temp.icon = name
-            }
-            if (isMenu !== undefined || isMenu !== null) {
-                temp.isMenu = isMenu
-            }
-            if (icon !== undefined || icon !== null) {
-                temp.icon = icon
-            }
-            if (permissionLevel !== undefined || permissionLevel !== null) {
-                temp.permissionLevel = permissionLevel
-            }
-            if (parentMenuId !== undefined || parentMenuId !== null) {
-                temp.parentMenuId = parentMenuId
-            }
-
             // 执行写入
-            await PermissionModel.add({
-                name,
-                text,
-                ...temp
-            })
+            await PermissionModel.add(checkParams.data)
             throwSuccess(ctx, {
                 msg: '添加成功'
             })
@@ -134,29 +118,25 @@ class PermissionController {
         try {
             const {
                 id,
-                name,
                 text,
+                permissionLevel,
+                name,
                 isMenu,
                 icon,
-                permissionLevel,
                 parentMenuId
             } = ctx.request.body
 
-            // 参数规则检测
-            const errorResponse = paramsVerify([
-                {
-                    msgLabel: 'id',
-                    value: id,
-                    rules: { required: true }
-                },
-                {
-                    msgLabel: '菜单名称',
-                    value: text,
-                    rules: { max: 10 }
-                }
+            const checkParams = checkRuleAndfilterEmpty([
+                { label: 'ID', value: id, rules: { required: true } },
+                { rename: 'text', label: '菜单名称', value: text, rules: { required: true, max: 10 } },
+                { rename: 'permissionLevel', label: '菜单权限', value: permissionLevel, rules: { required: true, reg: /^\d$/ } },
+                { rename: 'name', label: '菜单路由', value: name, rules: { reg: /^[a-zA-z]{1,10}$/ } },
+                { rename: 'isMenu', label: '展示到菜单栏', value: isMenu, rules: { reg: /^(false|true)$/ } },
+                { rename: 'icon', value: icon },
+                { rename: 'parentMenuId', value: parentMenuId }
             ])
-            if (errorResponse) {
-                throwError(ctx, 'rules', errorResponse)
+            if (checkParams.mistake) {
+                throwError(ctx, 'rules', checkParams.mistake)
                 return
             }
 
@@ -166,45 +146,24 @@ class PermissionController {
                 throwError(ctx, 'notExist', { msg: '该数据已不存在' })
                 return
             }
-            const temp = {}
 
-            if (
-                (name && name !== data.name) ||
-                (text && text !== data.text)
-            ) {
-                // 查询是否存在同名菜单
-                data = await PermissionModel.isExist({
-                    $or: {
-                        name,
-                        text
-                    }
-                })
+            if (name && name !== data.name) {
+                data = await PermissionModel.isExist({ name })
                 if (data) {
-                    throwError(ctx, 'isExist', { msg: '菜单名称或标识符已存在' })
+                    throwError(ctx, 'isExist', { msg: '标识符已存在' })
+                    return
+                }
+            }
+            if (text !== data.text) {
+                data = await PermissionModel.isExist({ text })
+                if (data) {
+                    throwError(ctx, 'isExist', { msg: '菜单名称已存在' })
                     return
                 }
             }
 
-            if (isMenu !== undefined && isMenu !== null) {
-                temp.isMenu = isMenu
-            }
-
-            if (icon !== undefined && icon !== null) {
-                temp.icon = icon
-            }
-            if (permissionLevel !== undefined && permissionLevel !== null) {
-                temp.permissionLevel = permissionLevel
-            }
-            if (parentMenuId !== undefined && parentMenuId !== null) {
-                temp.parentMenuId = parentMenuId
-            }
-
             // 执行写入
-            await PermissionModel.edit({
-                name,
-                text,
-                ...temp
-            }, {
+            await PermissionModel.edit(checkParams.data, {
                 id
             })
 
@@ -221,11 +180,11 @@ class PermissionController {
             const { id } = ctx.request.body
 
             // 参数规则检测
-            const errorResponse = paramsVerify([
-                { msgLabel: 'id', value: id, rules: { required: true } }
+            const checkParams = checkRuleAndfilterEmpty([
+                { label: 'ID', value: id, rules: { required: true } }
             ])
-            if (errorResponse) {
-                throwError(ctx, 'rules', errorResponse)
+            if (checkParams.mistake) {
+                throwError(ctx, 'rules', checkParams.mistake)
                 return
             }
 
