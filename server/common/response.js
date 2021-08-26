@@ -136,28 +136,30 @@ const checkRuleAndfilterEmpty = (params) => {
 
         // 判断是否空值
         if (value === undefined || value === null || value === '') {
-            if (rules.required) {
+            if (rules && rules.required) {
                 mistake = { code: 'e11', msg: `${label}不可为空` }
                 // 中断循环，抛出错误
                 break
             }
             // 此次执行停止，进入下一循环
-            return
+            continue
         }
-        // 判断字符长度
-        if (
-            (rules.max && value.length > rules.max) ||
+        if (rules) {
+            // 判断字符长度
+            if (
+                (rules.max && value.length > rules.max) ||
             (rules.min && value.length < rules.min)
-        ) {
-            mistake = { code: 'e12', msg: `${label}长度不合规` }
-            break
-        }
-        // 正则判断
-        if (
-            rules.reg && !rules.reg.test(value)
-        ) {
-            mistake = { code: 'e13', msg: `${label}格式不合规` }
-            break
+            ) {
+                mistake = { code: 'e12', msg: `${label}长度不合规` }
+                break
+            }
+            // 正则判断
+            if (
+                rules.reg && !rules.reg.test(value)
+            ) {
+                mistake = { code: 'e13', msg: `${label}格式不合规` }
+                break
+            }
         }
         // 值重组
         if (rename) {
