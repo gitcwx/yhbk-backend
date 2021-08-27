@@ -37,7 +37,7 @@ class UserController {
                 { rename: 'status', value: status },
                 { rename: 'loginFrom', value: loginFrom },
                 { rename: 'permissionLevel', value: permissionLevel }
-            ])
+            ], 'read')
 
             const result = await UserModel.list({
                 ...checkPage.data,
@@ -97,7 +97,7 @@ class UserController {
                     value: password,
                     rules: { required: true, reg: /^[a-zA-Z0-9~!@#$%^&*()+=|{}\-_]{4,16}$/ }
                 }
-            ])
+            ], 'read')
             if (checkParams.mistake) {
                 throwError(ctx, 'rules', checkParams.mistake)
                 return
@@ -156,7 +156,7 @@ class UserController {
                     value: password,
                     rules: { required: true, reg: /^[a-zA-Z0-9~!@#$%^&*()+=|{}\-_]{4,16}$/ }
                 }
-            ])
+            ], 'write')
             if (checkParams.mistake) {
                 throwError(ctx, 'rules', checkParams.mistake)
                 return
@@ -218,7 +218,7 @@ class UserController {
                     value: newPassword,
                     rules: { required: true, reg: /^[a-zA-Z0-9~!@#$%^&*()+=|{}\-_]{4,16}$/ }
                 }
-            ])
+            ], 'write')
             if (checkParams.mistake) {
                 throwError(ctx, 'rules', checkParams.mistake)
                 return
@@ -276,7 +276,7 @@ class UserController {
                 { rename: 'email', value: email, label: '邮箱', rules: { reg: /^([a-zA-Z0-9]+[_|_|\-|.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|_|.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/ } },
                 { rename: 'phone', value: phone, label: '手机号', rules: { reg: /^1[3-9]\d{9}$/ } },
                 { rename: 'status', value: status, label: '用户状态', rules: { reg: /^[123]$/ } }
-            ])
+            ], 'write')
             if (checkParams.mistake) {
                 throwError(ctx, 'rules', checkParams.mistake)
                 return
@@ -317,7 +317,7 @@ class UserController {
             // 参数规则检测
             const checkParams = checkRuleAndfilterEmpty([
                 { label: 'ID', value: id, rules: { required: true } }
-            ])
+            ], 'write')
             if (checkParams.mistake) {
                 throwError(ctx, 'rules', checkParams.mistake)
                 return

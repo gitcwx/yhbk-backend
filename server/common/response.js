@@ -119,7 +119,7 @@ const checkPageAndRewrite = (params, orderKeys) => {
     }
 }
 // 校验并重组其他参数
-const checkRuleAndfilterEmpty = (params) => {
+const checkRuleAndfilterEmpty = (params, type) => {
     let mistake
     // 重组参数 [查询条件 | 存库字段]
     const data = {}
@@ -135,20 +135,37 @@ const checkRuleAndfilterEmpty = (params) => {
         } = params[i]
 
         // 判断是否空值
-        if (value === undefined || value === null || value === '') {
-            if (rules && rules.required) {
-                mistake = { code: 'e11', msg: `${label}不可为空` }
-                // 中断循环，抛出错误
-                break
-            }
-            // 此次执行停止，进入下一循环
+        if (
+            rules &&
+            rules.required &&
+            (value === undefined || value === null || value === '')
+        ) {
+            mistake = { code: 'e11', msg: `${label}不可为空` }
+            // 中断循环，抛出错误
+            break
+        }
+
+        // read: [list, detail, info, login...]
+        // 查询接口 where 不需要空字符串参数
+        // write: [add, edit, del...]
+        // 写入接口 可以写入空字符串参数
+        if (
+            value === null ||
+            value === undefined ||
+            (value === '' && type === 'read')
+        ) {
+            // 进入下一循环
             continue
         }
-        if (rules) {
+        // else if (type === 'write') {
+        // 不停止，值写入
+        // }
+
+        if (rules && value !== '') {
             // 判断字符长度
             if (
                 (rules.max && value.length > rules.max) ||
-            (rules.min && value.length < rules.min)
+                (rules.min && value.length < rules.min)
             ) {
                 mistake = { code: 'e12', msg: `${label}长度不合规` }
                 break

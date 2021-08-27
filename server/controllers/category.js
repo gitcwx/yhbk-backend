@@ -18,7 +18,7 @@ class CategoryController {
             // 查询条件参数过滤重组
             const checkParams = checkRuleAndfilterEmpty([
                 { rename: 'name', value: name, rewrite: { $like: `%${name}%` } }
-            ])
+            ], 'read')
 
             const result = await CategoryModel.list({
                 ...checkPage.data,
@@ -41,7 +41,7 @@ class CategoryController {
             // 查询条件参数过滤重组
             const checkParams = checkRuleAndfilterEmpty([
                 { label: '分类名', value: name, rules: { required: true, max: 10 } }
-            ])
+            ], 'write')
             if (checkParams.mistake) {
                 throwError(ctx, 'rules', checkParams.mistake)
                 return
@@ -75,7 +75,7 @@ class CategoryController {
             const checkParams = checkRuleAndfilterEmpty([
                 { label: 'id', value: id, rules: { required: true } },
                 { label: '分类名', value: name, rules: { required: true, max: 10 } }
-            ])
+            ], 'write')
             if (checkParams.mistake) {
                 throwError(ctx, 'rules', checkParams.mistake)
                 return
@@ -123,7 +123,7 @@ class CategoryController {
             // 参数规则检测
             const checkParams = checkRuleAndfilterEmpty([
                 { label: 'id', value: id, rules: { required: true } }
-            ])
+            ], 'write')
             if (checkParams.mistake) {
                 throwError(ctx, 'rules', checkParams.mistake)
                 return

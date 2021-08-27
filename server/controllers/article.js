@@ -48,7 +48,7 @@ class ArticleController {
                 { rename: 'categoryId', value: categoryId },
                 { rename: 'tagIds', value: tagIds, rewrite: { $regexp: tagIds.replace(/,/g, '|') } },
                 { rename: 'authorId', value: authorId }
-            ])
+            ], 'read')
 
             // 查询文章列表
             const result = await ArticleModel.list({
@@ -94,7 +94,7 @@ class ArticleController {
             // 参数规则检测
             const checkParams = checkRuleAndfilterEmpty([
                 { label: 'id', value: id, rules: { required: true } }
-            ])
+            ], 'read')
             if (checkParams.mistake) {
                 throwError(ctx, 'rules', checkParams.mistake)
                 return
@@ -144,7 +144,7 @@ class ArticleController {
                 { rename: 'tagIds', value: tagIds },
                 { rename: 'status', value: status },
                 { rename: 'isTop', value: isTop }
-            ])
+            ], 'write')
             if (checkParams.mistake) {
                 throwError(ctx, 'rules', checkParams.mistake)
                 return
@@ -220,7 +220,7 @@ class ArticleController {
                 { rename: 'tagIds', value: tagIds },
                 { rename: 'status', value: status },
                 { rename: 'isTop', value: isTop }
-            ])
+            ], 'write')
             if (checkParams.mistake) {
                 throwError(ctx, 'rules', checkParams.mistake)
                 return
@@ -280,7 +280,7 @@ class ArticleController {
             // 参数规则检测
             const checkParams = checkRuleAndfilterEmpty([
                 { label: 'id', value: id, rules: { required: true } }
-            ])
+            ], 'write')
             if (checkParams.mistake) {
                 throwError(ctx, 'rules', checkParams.mistake)
                 return
