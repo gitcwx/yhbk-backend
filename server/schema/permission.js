@@ -23,6 +23,11 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.STRING,
             allowNull: false
         },
+        textEn: {
+            comment: 'Menu Name',
+            type: DataTypes.STRING,
+            allowNull: false
+        },
         icon: {
             comment: '菜单图标',
             type: DataTypes.STRING,

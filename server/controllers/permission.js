@@ -8,6 +8,7 @@ class PermissionController {
         try {
             const {
                 text,
+                textEn,
                 isMenu,
                 by,
                 permissionLevel
@@ -16,7 +17,7 @@ class PermissionController {
             // 参数规则检测
             const checkPage = checkPageAndRewrite(
                 ctx.request.body,
-                ['text', 'name', 'isMenu', 'permissionLevel', 'updatedAt'] // can order list
+                ['text', 'textEn', 'name', 'isMenu', 'permissionLevel', 'updatedAt'] // can order list
             )
             if (checkPage.mistake) {
                 throwError(ctx, 'rules', checkPage.mistake)
@@ -26,6 +27,7 @@ class PermissionController {
             // 查询条件参数过滤重组
             const checkList = [
                 { rename: 'text', value: text, rewrite: { $like: `%${text}%` } },
+                { rename: 'textEn', value: textEn, rewrite: { $like: `%${textEn}%` } },
                 { rename: 'isMenu', value: isMenu }
             ]
 
@@ -52,6 +54,7 @@ class PermissionController {
             })
             throwSuccess(ctx, {
                 msg: '查询成功',
+                msgEn: 'Query Success',
                 data: result.rows,
                 total: result.count
             })
@@ -64,6 +67,7 @@ class PermissionController {
         try {
             const {
                 text,
+                textEn,
                 permissionLevel,
                 name,
                 isMenu,
@@ -73,41 +77,45 @@ class PermissionController {
 
             // 查询条件参数过滤重组
             const checkParams = checkRuleAndfilterEmpty([
-                { rename: 'text', label: '菜单名称', value: text, rules: { required: true, max: 10 } },
-                { rename: 'permissionLevel', label: '菜单权限', value: permissionLevel, rules: { required: true, reg: /^\d$/ } },
-                { rename: 'name', label: '菜单路由', value: name, rules: { reg: /^[a-zA-z]{1,10}$/ } },
-                { rename: 'isMenu', label: '展示到菜单栏', value: isMenu, rules: { reg: /^(false|true)$/ } },
+                { rename: 'text', label: '菜单名称', labelEn: 'Chinese Menu Name', value: text, rules: { required: true, max: 10 } },
+                { rename: 'textEn', label: '英文菜单名称', labelEn: 'Menu Name', value: textEn, rules: { required: true, max: 16 } },
+                { rename: 'permissionLevel', label: '菜单权限', labelEn: 'Permission', value: permissionLevel, rules: { required: true, reg: /^\d$/ } },
+                { rename: 'name', label: '菜单路由', labelEn: 'Route Name', value: name, rules: { reg: /^[a-zA-z]{1,10}$/ } },
+                { rename: 'isMenu', label: '展示到菜单栏', labelEn: 'isMenu', value: isMenu, rules: { reg: /^(false|true)$/ } },
                 { rename: 'icon', value: icon },
                 { rename: 'parentMenuId', value: parentMenuId }
             ], 'write')
+
             if (checkParams.mistake) {
                 throwError(ctx, 'rules', checkParams.mistake)
                 return
             }
 
-            // 查询是否存在同名菜单
-            let conditions
             if (name) {
-                conditions = {
-                    $or: {
-                        name,
-                        text
-                    }
+                const checkName = await PermissionModel.isExist({ name })
+                if (checkName) {
+                    throwError(ctx, 'isExist', { msg: '标识符已存在', msgEn: 'Route Name Is Already Exist' })
+                    return
                 }
-            } else {
-                conditions = { text }
             }
-            const data = await PermissionModel.isExist(conditions)
 
-            if (data) {
-                throwError(ctx, 'isExist', { msg: '菜单名称或标识符已存在' })
+            const checkText = await PermissionModel.isExist({ text })
+            if (checkText) {
+                throwError(ctx, 'isExist', { msg: '菜单名称已存在', msgEn: 'Menu Name In Chinese Is Already Exist' })
+                return
+            }
+
+            const checkTextEn = await PermissionModel.isExist({ textEn })
+            if (checkTextEn) {
+                throwError(ctx, 'isExist', { msg: '英文菜单名称已存在', msgEn: 'Menu Name Is Already Exist' })
                 return
             }
 
             // 执行写入
             await PermissionModel.add(checkParams.data)
             throwSuccess(ctx, {
-                msg: '添加成功'
+                msg: '添加成功',
+                msgEn: 'Add Page Success'
             })
         } catch (err) {
             throwError(ctx, 500)
@@ -119,6 +127,7 @@ class PermissionController {
             const {
                 id,
                 text,
+                textEn,
                 permissionLevel,
                 name,
                 isMenu,
@@ -128,10 +137,11 @@ class PermissionController {
 
             const checkParams = checkRuleAndfilterEmpty([
                 { label: 'ID', value: id, rules: { required: true } },
-                { rename: 'text', label: '菜单名称', value: text, rules: { max: 10 } },
-                { rename: 'permissionLevel', label: '菜单权限', value: permissionLevel, rules: { reg: /^\d$/ } },
-                { rename: 'name', label: '菜单路由', value: name, rules: { reg: /^[a-zA-z]{1,10}$/ } },
-                { rename: 'isMenu', label: '展示到菜单栏', value: isMenu, rules: { reg: /^(false|true)$/ } },
+                { rename: 'text', label: '菜单名称', labelEn: 'Chinese Menu Name', value: text, rules: { max: 10 } },
+                { rename: 'textEn', label: '英文菜单名称', labelEn: 'Menu Name', value: textEn, rules: { max: 16 } },
+                { rename: 'permissionLevel', label: '菜单权限', labelEn: 'Permission', value: permissionLevel, rules: { reg: /^\d$/ } },
+                { rename: 'name', label: '菜单路由', labelEn: 'Route Name', value: name, rules: { reg: /^[a-zA-z]{1,10}$/ } },
+                { rename: 'isMenu', label: '展示到菜单栏', labelEn: 'isMenu', value: isMenu, rules: { reg: /^(false|true)$/ } },
                 { rename: 'icon', value: icon },
                 { rename: 'parentMenuId', value: parentMenuId }
             ], 'write')
@@ -141,34 +151,44 @@ class PermissionController {
             }
 
             // 查询是否存在
-            let data = await PermissionModel.isExist({ id })
+            const data = await PermissionModel.isExist({ id })
             if (!data) {
-                throwError(ctx, 'notExist', { msg: '该数据已不存在' })
+                throwError(ctx, 'notExist', { msg: '该数据已不存在', msgEn: 'Data Is Not Exist' })
                 return
             }
 
             if (name && name !== data.name) {
-                data = await PermissionModel.isExist({ name })
-                if (data) {
-                    throwError(ctx, 'isExist', { msg: '标识符已存在' })
+                const checkName = await PermissionModel.isExist({ name })
+                if (checkName) {
+                    throwError(ctx, 'isExist', { msg: '标识符已存在', msgEn: 'Route Name Is Already Exist' })
                     return
                 }
             }
+
             if (text && text !== data.text) {
-                data = await PermissionModel.isExist({ text })
-                if (data) {
-                    throwError(ctx, 'isExist', { msg: '菜单名称已存在' })
+                const checkText = await PermissionModel.isExist({ text })
+                if (checkText) {
+                    throwError(ctx, 'isExist', { msg: '菜单名称已存在', msgEn: 'Menu Name In Chinese Is Already Exist' })
                     return
                 }
             }
-            console.log(checkParams.data)
+
+            if (textEn && textEn !== data.textEn) {
+                const checkText = await PermissionModel.isExist({ text })
+                if (checkText) {
+                    throwError(ctx, 'isExist', { msg: '英文菜单名称已存在', msgEn: 'Menu Name Is Already Exist' })
+                    return
+                }
+            }
+
             // 执行写入
             await PermissionModel.edit(checkParams.data, {
                 id
             })
 
             throwSuccess(ctx, {
-                msg: '修改成功'
+                msg: '修改成功',
+                msgEn: 'Modify Success'
             })
         } catch (err) {
             throwError(ctx, 500)
@@ -191,14 +211,15 @@ class PermissionController {
             // 查询是否存在
             const data = await PermissionModel.isExist({ id })
             if (!data) {
-                throwError(ctx, 'notExist', { msg: '该数据已不存在' })
+                throwError(ctx, 'notExist', { msg: '该数据已不存在', msgEn: 'Data Is Not Exist' })
                 return
             }
 
             // 执行写入
             await PermissionModel.del(id)
             throwSuccess(ctx, {
-                msg: '删除成功'
+                msg: '删除成功',
+                msgEn: 'Delete Success'
             })
         } catch (err) {
             throwError(ctx, 500)

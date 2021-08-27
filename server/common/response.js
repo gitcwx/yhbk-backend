@@ -48,29 +48,30 @@ const throwError = (ctx, type, params) => {
 
     switch (type) {
     // 规则错误
-    case 'rules': result = { status: 200, code: params.code, msg: params.msg }; break
+    case 'rules': result = { status: 200, code: params.code, msg: params.msg, msgEn: params.msgEn }; break
     // 数据库存在相同数据
-    case 'isExist': result = { status: 200, code: 'e21', msg: params.msg }; break
+    case 'isExist': result = { status: 200, code: 'e21', msg: params.msg, msgEn: params.msgEn }; break
     // 不存在该数据
-    case 'notExist': result = { status: 200, code: 'e22', msg: params.msg }; break
+    case 'notExist': result = { status: 200, code: 'e22', msg: params.msg, msgEn: params.msgEn }; break
     // 数据不匹配
-    case 'notMatch': result = { status: 200, code: 'e23', msg: params.msg }; break
+    case 'notMatch': result = { status: 200, code: 'e23', msg: params.msg, msgEn: params.msgEn }; break
     // 无权修改
-    case 'forbidden': result = { status: 200, code: 'e24', msg: params.msg }; break
+    case 'forbidden': result = { status: 200, code: 'e24', msg: params.msg, msgEn: params.msgEn }; break
 
     // token认证失败
-    case 401: result = { status: 401, code: 'e81', msg: 'token认证失败' }; break
-    case 403: result = { status: 403, code: 'e83', msg: '权限不足' }; break
-    case 404: result = { status: 404, code: 'e84', msg: '请求资源未找到' }; break
-    case 405: result = { status: 405, code: 'e85', msg: 'token已过期' }; break
+    case 401: result = { status: 401, code: 'e81', msg: 'token认证失败', msgEn: 'Token Authorization Failed' }; break
+    case 403: result = { status: 403, code: 'e83', msg: '权限不足', msgEn: 'No Permission' }; break
+    case 404: result = { status: 404, code: 'e84', msg: '请求资源未找到', msgEn: '404 Mot Found' }; break
+    case 405: result = { status: 405, code: 'e85', msg: 'token已过期', msgEn: 'Token Is Out Of Date' }; break
     // 其他默认500
-    case 500: result = { status: 500, code: 'e99', msg: '服务器内部错误' }
+    case 500: result = { status: 500, code: 'e99', msg: '服务器内部错误', msgEn: 'Service Error' }
     }
 
     ctx.response.status = result.status
     ctx.body = {
         code: result.code,
-        msg: result.msg
+        msg: result.msg,
+        msgEn: params.msgEn
     }
 }
 
@@ -83,28 +84,28 @@ const checkPageAndRewrite = (params, orderKeys) => {
         hasValue(params.page) &&
         !/^[1-9]\d{0,2}$/.test(params.page)
     ) {
-        mistake = { code: 'e01', msg: '页码不合规' }
+        mistake = { code: 'e01', msg: '页码不合规', msgEn: 'Current Page Number Is Not In Reason' }
     }
     // 判断每页条数 limit
     if (
         hasValue(params.limit) &&
         !/^[1-9]\d{0,2}$/.test(params.limit)
     ) {
-        mistake = { code: 'e02', msg: '每页显示条数不合规' }
+        mistake = { code: 'e02', msg: '每页显示条数不合规', msgEn: 'Page Limit Is Not In Reason' }
     }
     // 判断排序规则
     if (
         hasValue(params.orderby) &&
         !/^(de|a)sc$/i.test(params.orderby)
     ) {
-        mistake = { code: 'e03', msg: '排序规则不合规' }
+        mistake = { code: 'e03', msg: '排序规则不合规', msgEn: 'Orderby Is Not In Reason' }
     }
     // 判断排序字段是否可用
     if (
         hasValue(params.orderName) &&
         orderKeys.indexOf(params.orderName) === -1
     ) {
-        mistake = { code: 'e04', msg: '排序字段不合规' }
+        mistake = { code: 'e04', msg: '排序字段不合规', msgEn: 'OrderName Is Not In Reason' }
     }
 
     // 参数重组
@@ -127,6 +128,7 @@ const checkRuleAndfilterEmpty = (params, type) => {
         const {
             // 规则验证参数
             label,
+            labelEn,
             value,
             rules,
             // [ 重组参数 ]
@@ -140,7 +142,7 @@ const checkRuleAndfilterEmpty = (params, type) => {
             rules.required &&
             (value === undefined || value === null || value === '')
         ) {
-            mistake = { code: 'e11', msg: `${label}不可为空` }
+            mistake = { code: 'e11', msg: `${label}不可为空`, msgEn: `${labelEn} Can't Be Empty` }
             // 中断循环，抛出错误
             break
         }
@@ -167,14 +169,14 @@ const checkRuleAndfilterEmpty = (params, type) => {
                 (rules.max && value.length > rules.max) ||
                 (rules.min && value.length < rules.min)
             ) {
-                mistake = { code: 'e12', msg: `${label}长度不合规` }
+                mistake = { code: 'e12', msg: `${label}长度不合规`, msgEn: `${labelEn} Length Is Not In Reason` }
                 break
             }
             // 正则判断
             if (
                 rules.reg && !rules.reg.test(value)
             ) {
-                mistake = { code: 'e13', msg: `${label}格式不合规` }
+                mistake = { code: 'e13', msg: `${label}格式不合规`, msgEn: `${labelEn} Format Is Not In Reason` }
                 break
             }
         }

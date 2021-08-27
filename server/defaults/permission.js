@@ -6,6 +6,7 @@ module.exports = [
         isMenu: true,
         name: 'dashboard',
         text: '控制台',
+        textEn: 'Panel',
         icon: 'el-icon-s-home',
         permissionLevel: 9,
         parentMenuId: ''
@@ -17,6 +18,7 @@ module.exports = [
         isMenu: true,
         name: 'userList',
         text: '用户管理',
+        textEn: 'User',
         icon: 'el-icon-user-solid',
         permissionLevel: 0,
         parentMenuId: ''
@@ -28,6 +30,7 @@ module.exports = [
         isMenu: true,
         name: 'permission',
         text: '权限控制',
+        textEn: 'Permission',
         icon: 'el-icon-set-up',
         permissionLevel: 0,
         parentMenuId: ''
@@ -39,6 +42,7 @@ module.exports = [
         isMenu: false,
         name: 'password',
         text: '修改密码',
+        textEn: 'Modify Password',
         icon: 'el-icon-lock',
         permissionLevel: 2,
         parentMenuId: ''
