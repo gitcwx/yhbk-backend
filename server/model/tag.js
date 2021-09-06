@@ -1,7 +1,4 @@
-const {
-    tag: Tag
-    // sequelize
-} = require('../schema')
+const { tag: Tag } = require('../schema')
 
 // 引入默认数据
 const defaultData = require('../defaults/tag')
@@ -36,9 +33,7 @@ class TagModel {
 
     // 数据插入
     static async add(params) {
-        return await Tag.create({
-            name: params.name
-        })
+        return await Tag.create(params)
     }
 
     // 数据编辑

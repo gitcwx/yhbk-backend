@@ -14,6 +14,12 @@ module.exports = function (sequelize, DataTypes) {
             unique: true,
             allowNull: false
         },
+        nameEn: {
+            comment: 'Tag Name',
+            type: DataTypes.STRING,
+            unique: true,
+            allowNull: false
+        },
         createdAt: {
             comment: '创建时间',
             type: DataTypes.DATE,
