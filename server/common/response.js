@@ -71,7 +71,7 @@ const throwError = (ctx, type, params) => {
     ctx.body = {
         code: result.code,
         msg: result.msg,
-        msgEn: params.msgEn
+        msgEn: result.msgEn
     }
 }
 
@@ -109,8 +109,8 @@ const checkPageAndRewrite = (params, orderKeys) => {
     }
 
     // 参数重组
-    data.page = params.page || 1
-    data.limit = params.limit || 10
+    data.page = params.page ? parseInt(params.page) : 1
+    data.limit = params.limit ? parseInt(params.limit) : 10
     data.orderby = params.orderby ? params.orderby.toLowerCase() : 'desc'
     data.orderName = params.orderName || 'updatedAt'
 

@@ -1,7 +1,4 @@
-const {
-    category: Category
-    // sequelize
-} = require('../schema')
+const { category: Category } = require('../schema')
 
 // 引入默认数据
 const defaultData = require('../defaults/category')
@@ -20,18 +17,14 @@ class CategoryModel {
             limit,
             orderby,
             orderName,
-            name
+            conditions
         } = params
 
         return await Category.findAndCountAll({
             attributes: { exclude: ['deletedAt'] },
             limit,
             offset: (page - 1) * limit,
-            where: {
-                name: {
-                    $like: `%${name}%`
-                }
-            },
+            where: conditions,
             order: [
                 [orderName, orderby]
             ]
@@ -40,9 +33,7 @@ class CategoryModel {
 
     // 数据插入
     static async add(params) {
-        return await Category.create({
-            name: params.name
-        })
+        return await Category.create(params)
     }
 
     // 数据编辑

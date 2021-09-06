@@ -77,7 +77,7 @@ class PermissionController {
 
             // 查询条件参数过滤重组
             const checkParams = checkRuleAndfilterEmpty([
-                { rename: 'text', label: '菜单名称', labelEn: 'Chinese Menu Name', value: text, rules: { required: true, max: 10 } },
+                { rename: 'text', label: '菜单名称', labelEn: 'Menu Name In Chinese', value: text, rules: { required: true, max: 10 } },
                 { rename: 'textEn', label: '英文菜单名称', labelEn: 'Menu Name', value: textEn, rules: { required: true, max: 16 } },
                 { rename: 'permissionLevel', label: '菜单权限', labelEn: 'Permission', value: permissionLevel, rules: { required: true, reg: /^\d$/ } },
                 { rename: 'name', label: '菜单路由', labelEn: 'Route Name', value: name, rules: { reg: /^[a-zA-z]{1,10}$/ } },
@@ -115,7 +115,7 @@ class PermissionController {
             await PermissionModel.add(checkParams.data)
             throwSuccess(ctx, {
                 msg: '添加成功',
-                msgEn: 'Add Page Success'
+                msgEn: 'Add Success'
             })
         } catch (err) {
             throwError(ctx, 500)
@@ -137,7 +137,7 @@ class PermissionController {
 
             const checkParams = checkRuleAndfilterEmpty([
                 { label: 'ID', value: id, rules: { required: true } },
-                { rename: 'text', label: '菜单名称', labelEn: 'Chinese Menu Name', value: text, rules: { max: 10 } },
+                { rename: 'text', label: '菜单名称', labelEn: 'Menu Name In Chinese', value: text, rules: { max: 10 } },
                 { rename: 'textEn', label: '英文菜单名称', labelEn: 'Menu Name', value: textEn, rules: { max: 16 } },
                 { rename: 'permissionLevel', label: '菜单权限', labelEn: 'Permission', value: permissionLevel, rules: { reg: /^\d$/ } },
                 { rename: 'name', label: '菜单路由', labelEn: 'Route Name', value: name, rules: { reg: /^[a-zA-z]{1,10}$/ } },
