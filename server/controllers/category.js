@@ -101,7 +101,7 @@ class CategoryController {
             // 查询是否存在
             const data = await CategoryModel.isExist({ id })
             if (!data) {
-                throwError(ctx, 'notExist', { msg: '该数据已不存在', msgEn: 'Data Is Not Exist' })
+                throwError(ctx, 'notExist', { msg: '该数据已不存在', msgEn: 'Data Is Already Not Exist' })
                 return
             }
             // 查询是否存在同名
@@ -155,7 +155,7 @@ class CategoryController {
             // 查询是否存在
             let data = await CategoryModel.isExist({ id })
             if (!data) {
-                throwError(ctx, 'notExist', { msg: '该数据已不存在', msgEn: 'Data Is Not Exist' })
+                throwError(ctx, 'notExist', { msg: '该数据已不存在', msgEn: 'Data Is Already Not Exist' })
                 return
             }
 

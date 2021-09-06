@@ -28,7 +28,7 @@ module.exports = [
             nickname: '管理员',
             username: 'admin',
             createdAt: '2021-08-06 14:57:28',
-            loginFrom: 0,
+            from: 0,
             updatedAt: '2021-08-06 14:57:28',
             lastLoginAt: '2021-08-06 14:57:28'
         }
@@ -62,7 +62,7 @@ module.exports = [
             nickname: '管理员',
             username: 'admin',
             createdAt: '2021-08-06 14:57:28',
-            loginFrom: 0,
+            from: 0,
             updatedAt: '2021-08-06 14:57:28',
             lastLoginAt: '2021-08-06 14:57:28'
         }
@@ -96,7 +96,7 @@ module.exports = [
             nickname: '管理员',
             username: 'admin',
             createdAt: '2021-08-06 14:57:28',
-            loginFrom: 0,
+            from: 0,
             updatedAt: '2021-08-06 14:57:28',
             lastLoginAt: '2021-08-06 14:57:28'
         }

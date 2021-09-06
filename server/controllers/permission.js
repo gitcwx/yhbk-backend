@@ -81,7 +81,7 @@ class PermissionController {
                 { rename: 'textEn', label: '英文菜单名称', labelEn: 'Menu Name', value: textEn, rules: { required: true, max: 16 } },
                 { rename: 'permissionLevel', label: '菜单权限', labelEn: 'Permission', value: permissionLevel, rules: { required: true, reg: /^\d$/ } },
                 { rename: 'name', label: '菜单路由', labelEn: 'Route Name', value: name, rules: { reg: /^[a-zA-z]{1,10}$/ } },
-                { rename: 'isMenu', label: '展示到菜单栏', labelEn: 'isMenu', value: isMenu, rules: { reg: /^(false|true)$/ } },
+                { rename: 'isMenu', label: '展示到菜单栏', labelEn: 'IsMenu', value: isMenu, rules: { reg: /^(false|true)$/ } },
                 { rename: 'icon', value: icon },
                 { rename: 'parentMenuId', value: parentMenuId }
             ], 'write')
@@ -141,7 +141,7 @@ class PermissionController {
                 { rename: 'textEn', label: '英文菜单名称', labelEn: 'Menu Name', value: textEn, rules: { max: 16 } },
                 { rename: 'permissionLevel', label: '菜单权限', labelEn: 'Permission', value: permissionLevel, rules: { reg: /^\d$/ } },
                 { rename: 'name', label: '菜单路由', labelEn: 'Route Name', value: name, rules: { reg: /^[a-zA-z]{1,10}$/ } },
-                { rename: 'isMenu', label: '展示到菜单栏', labelEn: 'isMenu', value: isMenu, rules: { reg: /^(false|true)$/ } },
+                { rename: 'isMenu', label: '展示到菜单栏', labelEn: 'IsMenu', value: isMenu, rules: { reg: /^(false|true)$/ } },
                 { rename: 'icon', value: icon },
                 { rename: 'parentMenuId', value: parentMenuId }
             ], 'write')
@@ -153,7 +153,7 @@ class PermissionController {
             // 查询是否存在
             const data = await PermissionModel.isExist({ id })
             if (!data) {
-                throwError(ctx, 'notExist', { msg: '该数据已不存在', msgEn: 'Data Is Not Exist' })
+                throwError(ctx, 'notExist', { msg: '该数据已不存在', msgEn: 'Data Is Already Not Exist' })
                 return
             }
 
@@ -211,7 +211,7 @@ class PermissionController {
             // 查询是否存在
             const data = await PermissionModel.isExist({ id })
             if (!data) {
-                throwError(ctx, 'notExist', { msg: '该数据已不存在', msgEn: 'Data Is Not Exist' })
+                throwError(ctx, 'notExist', { msg: '该数据已不存在', msgEn: 'Data Is Already Not Exist' })
                 return
             }
 

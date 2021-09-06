@@ -102,7 +102,7 @@ class TagController {
             // 查询是否存在
             const data = await TagModel.isExist({ id })
             if (!data) {
-                throwError(ctx, 'notExist', { msg: '该数据已不存在', msgEn: 'Data Is Not Exist' })
+                throwError(ctx, 'notExist', { msg: '该数据已不存在', msgEn: 'Data Is Not Already Exist' })
                 return
             }
 
@@ -151,7 +151,7 @@ class TagController {
             // 查询是否存在
             const data = await TagModel.isExist({ id })
             if (!data) {
-                throwError(ctx, 'notExist', { msg: '该数据已不存在', msgEn: 'Data Is Not Exist' })
+                throwError(ctx, 'notExist', { msg: '该数据已不存在', msgEn: 'Data Is Already Not Exist' })
                 return
             }
 

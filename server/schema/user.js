@@ -79,7 +79,7 @@ module.exports = function (sequelize, DataTypes) {
             allowNull: false,
             defaultValue: 1
         },
-        loginFrom: {
+        from: {
             comment: '登录途径 0:本站注册 1:QQ授权 2: ',
             type: DataTypes.INTEGER,
             defaultValue: 0

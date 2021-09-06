@@ -60,15 +60,7 @@ class UserModel {
 
     // 数据插入
     static async add(params) {
-        const salt = UUID()
-        const password = await MD5(params.password, salt)
-
-        return await User.create({
-            username: params.username,
-            nickname: params.nickname || params.username,
-            password,
-            salt
-        })
+        return await User.create(params)
     }
 
     // 修改密码
