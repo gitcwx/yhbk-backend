@@ -1,5 +1,6 @@
 const { CategoryModel, ArticleModel } = require('../model')
 const { throwSuccess, throwError, checkPageAndRewrite, checkRuleAndfilterEmpty } = require('../common/response')
+const { isMaster } = require('../common/checkUser')
 
 class CategoryController {
     static async list(ctx) {
@@ -12,7 +13,8 @@ class CategoryController {
             // 参数规则检测
             const checkPage = checkPageAndRewrite(
                 ctx.request.body,
-                ['name', 'nameEn', 'updatedAt'] // can order list
+                // 允许排序的字段
+                ['name', 'nameEn', 'updatedAt']
             )
             if (checkPage.mistake) {
                 throwError(ctx, 'rules', checkPage.mistake)
@@ -56,6 +58,9 @@ class CategoryController {
                 return
             }
 
+            // 非管理员不可操作
+            if (!await isMaster(ctx)) { return }
+
             // 查询是否存在同名分类
             let data = await CategoryModel.isExist({ name })
             if (data) {
@@ -97,6 +102,9 @@ class CategoryController {
                 throwError(ctx, 'rules', checkParams.mistake)
                 return
             }
+
+            // 非管理员不可操作
+            if (!await isMaster(ctx)) { return }
 
             // 查询是否存在
             const data = await CategoryModel.isExist({ id })
@@ -145,12 +153,15 @@ class CategoryController {
 
             // 参数规则检测
             const checkParams = checkRuleAndfilterEmpty([
-                { label: 'ID', value: id, rules: { required: true } }
+                { label: 'ID', labelEn: 'ID', value: id, rules: { required: true } }
             ], 'write')
             if (checkParams.mistake) {
                 throwError(ctx, 'rules', checkParams.mistake)
                 return
             }
+
+            // 非管理员不可操作
+            if (!await isMaster(ctx)) { return }
 
             // 查询是否存在
             let data = await CategoryModel.isExist({ id })

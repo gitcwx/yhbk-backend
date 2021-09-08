@@ -1,5 +1,6 @@
 const { TagModel } = require('../model')
 const { throwSuccess, throwError, checkPageAndRewrite, checkRuleAndfilterEmpty } = require('../common/response')
+const { isMaster } = require('../common/checkUser')
 
 class TagController {
     static async list(ctx) {
@@ -12,7 +13,8 @@ class TagController {
             // 参数规则检测
             const checkPage = checkPageAndRewrite(
                 ctx.request.body,
-                ['name', 'nameEn', 'updatedAt'] // can order list
+                // 允许排序的字段
+                ['name', 'nameEn', 'updatedAt']
             )
             if (checkPage.mistake) {
                 throwError(ctx, 'rules', checkPage.mistake)
@@ -57,6 +59,9 @@ class TagController {
                 return
             }
 
+            // 非管理员不可操作
+            if (!await isMaster(ctx)) { return }
+
             // 查询是否存在同名标签
             let data = await TagModel.isExist({ name })
             if (data) {
@@ -98,6 +103,9 @@ class TagController {
                 throwError(ctx, 'rules', checkParams.mistake)
                 return
             }
+
+            // 非管理员不可操作
+            if (!await isMaster(ctx)) { return }
 
             // 查询是否存在
             const data = await TagModel.isExist({ id })
@@ -141,12 +149,15 @@ class TagController {
 
             // 参数规则检测
             const checkParams = checkRuleAndfilterEmpty([
-                { label: 'id', value: id, rules: { required: true } }
+                { label: 'ID', labelEn: 'ID', value: id, rules: { required: true } }
             ], 'write')
             if (checkParams.mistake) {
                 throwError(ctx, 'rules', checkParams.mistake)
                 return
             }
+
+            // 非管理员不可操作
+            if (!await isMaster(ctx)) { return }
 
             // 查询是否存在
             const data = await TagModel.isExist({ id })

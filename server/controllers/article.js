@@ -1,10 +1,6 @@
-const {
-    ArticleModel,
-    CategoryModel,
-    TagModel,
-    UserModel
-} = require('../model')
+const { ArticleModel, CategoryModel, TagModel, UserModel } = require('../model')
 const { throwSuccess, throwError, checkPageAndRewrite, checkRuleAndfilterEmpty } = require('../common/response')
+const { isMaster } = require('../common/checkUser')
 
 class ArticleController {
     static async list(ctx) {
@@ -21,7 +17,8 @@ class ArticleController {
             // 参数规则检测
             const checkPage = checkPageAndRewrite(
                 ctx.request.body,
-                ['title', 'viewCount', 'likeCount', 'isTop', 'status', 'categoryId', 'authorId', 'updatedAt'] // can order list
+                // 允许排序的字段
+                ['title', 'viewCount', 'likeCount', 'isTop', 'status', 'categoryId', 'authorId', 'updatedAt']
             )
             if (checkPage.mistake) {
                 throwError(ctx, 'rules', checkPage.mistake)
@@ -79,6 +76,7 @@ class ArticleController {
 
             throwSuccess(ctx, {
                 msg: '查询成功',
+                msgEn: 'Query Success',
                 data: result.rows,
                 total: result.count
             })
@@ -93,7 +91,7 @@ class ArticleController {
 
             // 参数规则检测
             const checkParams = checkRuleAndfilterEmpty([
-                { label: 'id', value: id, rules: { required: true } }
+                { label: 'ID', labelEn: 'ID', value: id, rules: { required: true } }
             ], 'read')
             if (checkParams.mistake) {
                 throwError(ctx, 'rules', checkParams.mistake)
@@ -102,7 +100,7 @@ class ArticleController {
 
             const data = await ArticleModel.detail(id)
             if (!data) {
-                throwError(ctx, 'notExist', { msg: '该数据已不存在' })
+                throwError(ctx, 'notExist', { msg: '该数据已不存在', msgEn: 'Data Is Already Not Exist' })
                 return
             }
             const idsArr = data.tagIds.split(',')
@@ -112,6 +110,7 @@ class ArticleController {
             }
             throwSuccess(ctx, {
                 msg: '查询成功',
+                msgEn: 'Query Success',
                 data
             })
         } catch (err) {
@@ -135,12 +134,12 @@ class ArticleController {
 
             // 查询条件参数过滤重组
             const checkParams = checkRuleAndfilterEmpty([
-                { rename: 'title', label: '标题', value: title, rules: { required: true, max: 50 } },
+                { rename: 'title', label: '标题', labelEn: 'Title', value: title, rules: { required: true, max: 50 } },
                 { rename: 'cover', value: cover },
-                { rename: 'abstract', label: '文章摘要', value: abstract, rules: { required: true, max: 500 } },
-                { rename: 'content', label: '文章内容', value: content, rules: { required: true, max: 5000 } },
-                { rename: 'authorId', label: '文章作者', value: authorId, rules: { required: true } },
-                { rename: 'categoryId', label: '文章分类', value: categoryId, rules: { required: true } },
+                { rename: 'abstract', label: '文章摘要', labelEn: 'Abstract', value: abstract, rules: { required: true, max: 500 } },
+                { rename: 'content', label: '文章内容', labelEn: 'Article Detail', value: content, rules: { required: true, max: 5000 } },
+                { rename: 'authorId', label: '文章作者', labelEn: 'Author', value: authorId, rules: { required: true } },
+                { rename: 'categoryId', label: '文章分类', labelEn: 'Category', value: categoryId, rules: { required: true } },
                 { rename: 'tagIds', value: tagIds },
                 { rename: 'status', value: status },
                 { rename: 'isTop', value: isTop }
@@ -149,19 +148,22 @@ class ArticleController {
                 throwError(ctx, 'rules', checkParams.mistake)
                 return
             }
-            const params = checkParams.data
 
+            // 非管理员不可操作
+            if (!await isMaster(ctx)) { return }
+
+            const params = checkParams.data
             // authorId是否存在
             const author = await UserModel.info(authorId)
             if (!author) {
-                throwError(ctx, 'notExist', { msg: '作者ID不存在' })
+                throwError(ctx, 'notExist', { msg: '作者ID不存在', msgEn: 'Author Is Not Exist' })
                 return
             }
 
             // categoryId是否存在
             const category = await CategoryModel.isExist({ id: categoryId })
             if (!category) {
-                throwError(ctx, 'notExist', { msg: '文章分类不合规' })
+                throwError(ctx, 'notExist', { msg: '文章分类不合规', msgEn: 'Category Is Not Exist' })
                 return
             }
             params.categoryName = category.name
@@ -169,7 +171,7 @@ class ArticleController {
             // 查询是否存在同名文章
             const data = await ArticleModel.isExist({ title })
             if (data) {
-                throwError(ctx, 'isExist', { msg: '标题已存在' })
+                throwError(ctx, 'isExist', { msg: '标题已存在', msgEn: 'Title Is Already Exist' })
                 return
             }
 
@@ -178,7 +180,7 @@ class ArticleController {
                 const idsArr = tagIds.split(',')
                 const tagsArr = await TagModel.queryByIds(idsArr)
                 if (tagsArr.length !== idsArr.length) {
-                    throwError(ctx, 'notExist', { msg: '存在不合规的标签' })
+                    throwError(ctx, 'notExist', { msg: '存在不合规的标签', msgEn: 'There Are Error Tags' })
                     return
                 }
             }
@@ -186,7 +188,8 @@ class ArticleController {
             // 执行写入
             await ArticleModel.add(params)
             throwSuccess(ctx, {
-                msg: '添加成功'
+                msg: '添加成功',
+                msgEn: 'Add Success'
             })
         } catch (err) {
             throwError(ctx, 500)
@@ -211,12 +214,13 @@ class ArticleController {
             // 查询条件参数过滤重组
             const checkParams = checkRuleAndfilterEmpty([
                 { label: 'ID', value: id, rules: { required: true } },
-                { rename: 'title', label: '标题', value: title, rules: { required: true, max: 50 } },
+                { rename: 'title', label: '标题', labelEn: 'Title', value: title, rules: { required: true, max: 50 } },
                 { rename: 'cover', value: cover },
-                { rename: 'abstract', label: '文章摘要', value: abstract, rules: { required: true, max: 500 } },
-                { rename: 'content', label: '文章内容', value: content, rules: { required: true, max: 5000 } },
-                { label: '文章作者', value: authorId, rules: { required: true } },
-                { label: '文章分类', value: categoryId, rules: { required: true } },
+                { rename: 'abstract', label: '文章摘要', labelEn: 'Abstract', value: abstract, rules: { required: true, max: 500 } },
+                { rename: 'content', label: '文章内容', labelEn: 'Article Detail', value: content, rules: { required: true, max: 5000 } },
+                // 不写rename，后续赋值
+                { label: '文章作者', labelEn: 'Author', value: authorId, rules: { required: true } },
+                { label: '文章分类', labelEn: 'Category', value: categoryId, rules: { required: true } },
                 { rename: 'tagIds', value: tagIds },
                 { rename: 'status', value: status },
                 { rename: 'isTop', value: isTop }
@@ -225,25 +229,28 @@ class ArticleController {
                 throwError(ctx, 'rules', checkParams.mistake)
                 return
             }
-            const params = checkParams.data
 
+            // 非管理员不可操作
+            if (!await isMaster(ctx)) { return }
+
+            const params = checkParams.data
             // 查询文章是否存在
             const data = await ArticleModel.isExist({ id })
             if (!data) {
-                throwError(ctx, 'isExist', { msg: '该文章已不存在' })
+                throwError(ctx, 'isExist', { msg: '该文章已不存在', msgEn: 'Article Is Already Not Exist' })
                 return
             }
 
             // authorId改变
             if (data.authorId !== authorId) {
-                throwError(ctx, 'forbidden', { msg: '无权修改' })
+                throwError(ctx, 'forbidden', { msg: '无权修改', msgEn: 'No Permission' })
                 return
             }
             // categoryId改变
             if (data.categoryId !== categoryId) {
                 const category = await CategoryModel.isExist({ id: categoryId })
                 if (!category) {
-                    throwError(ctx, 'notExist', { msg: '文章分类不合规' })
+                    throwError(ctx, 'notExist', { msg: '文章分类不合规', msgEn: 'Category Is Not Exist' })
                     return
                 } else {
                     params.categoryName = category.name
@@ -256,7 +263,7 @@ class ArticleController {
                 if (idsArr.length) {
                     const tagsArr = await TagModel.queryByIds(idsArr)
                     if (tagsArr.length !== idsArr.length) {
-                        throwError(ctx, 'notExist', { msg: '存在不合规的标签' })
+                        throwError(ctx, 'notExist', { msg: '存在不合规的标签', msgEn: 'There Are Error Tags' })
                         return
                     }
                 }
@@ -266,7 +273,8 @@ class ArticleController {
                 id
             })
             throwSuccess(ctx, {
-                msg: '修改成功'
+                msg: '修改成功',
+                msgEn: 'Modify Success'
             })
         } catch (err) {
             throwError(ctx, 500)
@@ -279,24 +287,28 @@ class ArticleController {
 
             // 参数规则检测
             const checkParams = checkRuleAndfilterEmpty([
-                { label: 'id', value: id, rules: { required: true } }
+                { label: 'ID', labelEn: 'ID', value: id, rules: { required: true } }
             ], 'write')
             if (checkParams.mistake) {
                 throwError(ctx, 'rules', checkParams.mistake)
                 return
             }
 
+            // 非管理员不可操作
+            if (!await isMaster(ctx)) { return }
+
             // 查询是否存在
             const data = await ArticleModel.isExist({ id })
             if (!data) {
-                throwError(ctx, 'notExist', { msg: '该数据已不存在' })
+                throwError(ctx, 'notExist', { msg: '该数据已不存在', msgEn: 'Data Is Already Not Exist' })
                 return
             }
 
             // 执行写入
             await ArticleModel.del(id)
             throwSuccess(ctx, {
-                msg: '删除成功'
+                msg: '删除成功',
+                msgEn: 'Delete Success'
             })
         } catch (err) {
             throwError(ctx, 500)

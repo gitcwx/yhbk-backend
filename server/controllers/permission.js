@@ -1,5 +1,6 @@
 const { PermissionModel, UserModel } = require('../model')
 const { throwSuccess, throwError, checkPageAndRewrite, checkRuleAndfilterEmpty } = require('../common/response')
+const { isMaster } = require('../common/checkUser')
 const jwt = require('jsonwebtoken')
 const { token } = require('../../config')
 
@@ -17,7 +18,8 @@ class PermissionController {
             // 参数规则检测
             const checkPage = checkPageAndRewrite(
                 ctx.request.body,
-                ['text', 'textEn', 'name', 'isMenu', 'permissionLevel', 'updatedAt'] // can order list
+                // 允许排序的字段
+                ['text', 'textEn', 'name', 'isMenu', 'permissionLevel', 'updatedAt']
             )
             if (checkPage.mistake) {
                 throwError(ctx, 'rules', checkPage.mistake)
@@ -85,11 +87,13 @@ class PermissionController {
                 { rename: 'icon', value: icon },
                 { rename: 'parentMenuId', value: parentMenuId }
             ], 'write')
-
             if (checkParams.mistake) {
                 throwError(ctx, 'rules', checkParams.mistake)
                 return
             }
+
+            // 非管理员不可操作
+            if (!await isMaster(ctx)) { return }
 
             if (name) {
                 const checkName = await PermissionModel.isExist({ name })
@@ -150,6 +154,9 @@ class PermissionController {
                 return
             }
 
+            // 非管理员不可操作
+            if (!await isMaster(ctx)) { return }
+
             // 查询是否存在
             const data = await PermissionModel.isExist({ id })
             if (!data) {
@@ -201,12 +208,15 @@ class PermissionController {
 
             // 参数规则检测
             const checkParams = checkRuleAndfilterEmpty([
-                { label: 'ID', value: id, rules: { required: true } }
+                { label: 'ID', labelEn: 'ID', value: id, rules: { required: true } }
             ], 'write')
             if (checkParams.mistake) {
                 throwError(ctx, 'rules', checkParams.mistake)
                 return
             }
+
+            // 非管理员不可操作
+            if (!await isMaster(ctx)) { return }
 
             // 查询是否存在
             const data = await PermissionModel.isExist({ id })

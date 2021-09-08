@@ -20,7 +20,8 @@ class UserController {
             // 参数规则检测
             const checkPage = checkPageAndRewrite(
                 ctx.request.body,
-                ['username', 'nickname', 'birth', 'lastLoginAt', 'updatedAt'] // can order list
+                // 允许排序的字段
+                ['username', 'nickname', 'birth', 'lastLoginAt', 'updatedAt']
             )
             if (checkPage.mistake) {
                 throwError(ctx, 'rules', checkPage.mistake)
@@ -178,21 +179,27 @@ class UserController {
                 { rename: 'status', value: status, label: '用户状态', labelEn: 'User Status', rules: { reg: /^[123]$/ } },
                 { rename: 'avatar', value: avatar },
                 { rename: 'motto', value: motto, rules: { max: 100 } },
-                {
-                    rename: 'permissionLevel',
-                    value: permissionLevel,
-                    rules: { reg: /^\d$/ }
-                }
+                { rename: 'permissionLevel', value: permissionLevel, rules: { reg: /^\d$/ } }
             ], 'write')
             if (checkParams.mistake) {
                 throwError(ctx, 'rules', checkParams.mistake)
                 return
             }
 
+            const auth = ctx.request.headers.authorization.replace('Bearer ', '')
+            const userId = await jwt.verify(auth, token.key).id
+            const userInfo = await UserModel.info(userId)
+
+            // 调整权限
+            if (!isNaN(permissionLevel)) {
+                if (permissionLevel <= userInfo.permissionLevel) {
+                    throwError(ctx, 'forbidden', { msg: '无法赋予高于自身的权限', msgEn: 'You Can Not Set A Higher Permission Than Your\'s' })
+                    return
+                }
+            }
+
             // 查询登录名是否存在
-            let data = await UserModel.isExist({
-                username
-            })
+            let data = await UserModel.isExist({ username })
             if (data) {
                 throwError(ctx, 'isExist', { msg: '登录名已存在', msgEn: 'Username Is Already Exist' })
                 return
@@ -266,6 +273,15 @@ class UserController {
                 return
             }
 
+            const auth = ctx.request.headers.authorization.replace('Bearer ', '')
+            const userId = await jwt.verify(auth, token.key).id
+            const userInfo = await UserModel.info(userId)
+            // 检测自身权限是否可以修改其他人信息
+            if (id !== userInfo.id && data.permissionLevel <= userInfo.permissionLevel) {
+                throwError(ctx, 'forbidden', { msg: '无法修改更高级用户信息', msgEn: 'You Can Not Edit A Higher Permission User' })
+                return
+            }
+
             // 检查原密码是否正确
             const secret = await MD5(password, data.salt)
             if (data.password !== secret) {
@@ -333,15 +349,13 @@ class UserController {
                 // 调整自身权限
                 if (id === userInfo.id) {
                     if (permissionLevel < userInfo.permissionLevel) {
-                        throwError(ctx, 'forbidden', { msg: '无法提升自身的权限', msgEn: 'You Can Not Improve You Permission By Yourself' })
+                        throwError(ctx, 'forbidden', { msg: '无法提升自身的权限', msgEn: 'You Can Not Improve Your Permission By Yourself' })
                         return
                     }
                 // 调整其他用户权限
-                } else {
-                    if (permissionLevel <= userInfo.permissionLevel) {
-                        throwError(ctx, 'forbidden', { msg: '无法赋予高于自身的权限', msgEn: 'You Can Not Set A Higher Permission Than Your\'s' })
-                        return
-                    }
+                } else if (permissionLevel <= userInfo.permissionLevel) {
+                    throwError(ctx, 'forbidden', { msg: '无法赋予高于自身的权限', msgEn: 'You Can Not Set A Higher Permission Than Your\'s' })
+                    return
                 }
             }
 
@@ -354,7 +368,7 @@ class UserController {
 
             // 检测自身权限是否可以修改其他人信息
             if (id !== userInfo.id && data.permissionLevel <= userInfo.permissionLevel) {
-                throwError(ctx, 'forbidden', { msg: '无法修改高级用户信息', msgEn: 'You Can Not Edit A Higher Permission User' })
+                throwError(ctx, 'forbidden', { msg: '无法修改更高级用户信息', msgEn: 'You Can Not Edit A Higher Permission User' })
                 return
             }
 
@@ -386,7 +400,7 @@ class UserController {
 
             // 参数规则检测
             const checkParams = checkRuleAndfilterEmpty([
-                { label: 'ID', value: id, rules: { required: true } }
+                { label: 'ID', labelEn: 'ID', value: id, rules: { required: true } }
             ], 'write')
             if (checkParams.mistake) {
                 throwError(ctx, 'rules', checkParams.mistake)
@@ -397,6 +411,15 @@ class UserController {
             let data = await UserModel.isExist({ id })
             if (!data) {
                 throwError(ctx, 'notExist', { msg: '该用户不存在', msgEn: 'The User Is Already Not Exist' })
+                return
+            }
+
+            const auth = ctx.request.headers.authorization.replace('Bearer ', '')
+            const userId = await jwt.verify(auth, token.key).id
+            const userInfo = await UserModel.info(userId)
+            // 检测自身权限是否可以修改其他人信息
+            if (id !== userInfo.id && data.permissionLevel <= userInfo.permissionLevel) {
+                throwError(ctx, 'forbidden', { msg: '无法删除更高级用户', msgEn: 'You Can Not Delete A Higher Permission User' })
                 return
             }
 
