@@ -35,6 +35,12 @@ const codes = {
 
 // 返回成功
 const throwSuccess = (ctx, params) => {
+    const language = ctx.request.headers.language
+    if (language === 'en') {
+        params.msg = params.msgEn
+    }
+    delete params.msgEn
+
     ctx.response.status = 200
     ctx.body = {
         code: 's00',
@@ -68,10 +74,10 @@ const throwError = (ctx, type, params) => {
     }
 
     ctx.response.status = result.status
+
     ctx.body = {
         code: result.code,
-        msg: result.msg,
-        msgEn: result.msgEn
+        msg: ctx.request.headers.language === 'en' ? result.msgEn : result.msg
     }
 }
 

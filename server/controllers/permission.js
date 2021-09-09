@@ -82,7 +82,7 @@ class PermissionController {
                 { rename: 'text', label: '菜单名称', labelEn: 'Menu Name In Chinese', value: text, rules: { required: true, max: 10 } },
                 { rename: 'textEn', label: '英文菜单名称', labelEn: 'Menu Name', value: textEn, rules: { required: true, max: 16 } },
                 { rename: 'permissionLevel', label: '菜单权限', labelEn: 'Permission', value: permissionLevel, rules: { required: true, reg: /^\d$/ } },
-                { rename: 'name', label: '菜单路由', labelEn: 'Route Name', value: name, rules: { reg: /^[a-zA-z]{1,10}$/ } },
+                { rename: 'name', label: '菜单路由', labelEn: 'Route Name', value: name, rules: { reg: /^[a-zA-Z]{1,10}$/ } },
                 { rename: 'isMenu', label: '展示到菜单栏', labelEn: 'IsMenu', value: isMenu, rules: { reg: /^(false|true)$/ } },
                 { rename: 'icon', value: icon },
                 { rename: 'parentMenuId', value: parentMenuId }
