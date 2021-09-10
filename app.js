@@ -34,7 +34,8 @@ app.use(
     koaJwt({
         secret: token.key
     }).unless({
-        path: [/login/, '/api/user/register']
+        path: [/login/, '/api/user/register'],
+        method: 'GET'
     })
 )
 
