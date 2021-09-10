@@ -135,12 +135,57 @@ class UserController {
     }
 
     // 注册
-    static async register(ctx, next) {
-        await UserController.add(ctx, next, true)
+    static async register(ctx) {
+        try {
+            const {
+                username,
+                password
+            } = ctx.request.body
+            const salt = UUID()
+
+            // 参数规则检测
+            const checkParams = checkRuleAndfilterEmpty([
+                { rename: 'username', value: username, label: '登录名', labelEn: 'Username', rules: { required: true, reg: /^[\u4e00-\u9fa5a-zA-Z0-9_]{4,16}$/ } },
+                {
+                    rename: 'password',
+                    value: password,
+                    label: '密码',
+                    labelEn: 'Password',
+                    rules: { required: true, reg: /^[a-zA-Z0-9~!@#$%^&*()+=|{}\-_]{4,16}$/ },
+                    rewrite: await MD5(password, salt)
+                },
+                { rename: 'nickname', value: username, rewrite: username },
+                { rename: 'salt', value: password, rewrite: salt }
+            ], 'write')
+            if (checkParams.mistake) {
+                throwError(ctx, 'rules', checkParams.mistake)
+                return
+            }
+            // 查询登录名是否存在
+            let data = await UserModel.isExist({ username })
+            if (data) {
+                throwError(ctx, 'isExist', { msg: '登录名已存在', msgEn: 'Username Is Already Exist' })
+                return
+            }
+
+            // 执行写入
+            data = await UserModel.add(checkParams.data)
+            throwSuccess(ctx, {
+                msg: '注册成功',
+                msgEn: 'Register Success',
+                token: jwt.sign(
+                    { id: data.id, username: data.username },
+                    token.key,
+                    { expiresIn: token.expire }
+                )
+            })
+        } catch (err) {
+            throwError(ctx, 500)
+        }
     }
 
     // todo 新增用户 参数待补全
-    static async add(ctx, next, isRegister) {
+    static async add(ctx) {
         try {
             const {
                 username,
@@ -160,7 +205,6 @@ class UserController {
 
             // 参数规则检测
             const checkParams = checkRuleAndfilterEmpty([
-                { rename: 'salt', value: password, rewrite: salt },
                 { rename: 'username', value: username, label: '登录名', labelEn: 'Username', rules: { required: true, reg: /^[\u4e00-\u9fa5a-zA-Z0-9_]{4,16}$/ } },
                 {
                     rename: 'password',
@@ -170,7 +214,15 @@ class UserController {
                     rules: { required: true, reg: /^[a-zA-Z0-9~!@#$%^&*()+=|{}\-_]{4,16}$/ },
                     rewrite: await MD5(password, salt)
                 },
-                { rename: 'nickname', value: nickname, label: '昵称', labelEn: 'Nickname', rules: { required: true, reg: /^[\u4e00-\u9fa5a-zA-Z0-9_]{1,16}$/ } },
+                { rename: 'salt', value: password, rewrite: salt },
+                {
+                    rename: 'nickname',
+                    value: nickname,
+                    label: '昵称',
+                    labelEn: 'Nickname',
+                    rules: { reg: /^[\u4e00-\u9fa5a-zA-Z0-9_]{1,16}$/ },
+                    rewrite: nickname || username
+                },
                 { rename: 'birth', value: birth, label: '生日', labelEn: 'Birthday', rules: { reg: /^\d{4}-\d{2}-\d{2}$/ } },
                 { rename: 'gender', value: gender, label: '性别', labelEn: 'Gender', rules: { reg: /^[012]$/ } },
                 { rename: 'location', value: location, label: '省市县区', labelEn: 'Location', rules: { reg: /^\d{6}-\d{6}-\d{6}$/ } },
@@ -178,8 +230,8 @@ class UserController {
                 { rename: 'phone', value: phone, label: '手机号', labelEn: 'Contact', rules: { reg: /^1[3-9]\d{9}$/ } },
                 { rename: 'status', value: status, label: '用户状态', labelEn: 'User Status', rules: { reg: /^[123]$/ } },
                 { rename: 'avatar', value: avatar },
-                { rename: 'motto', value: motto, rules: { max: 100 } },
-                { rename: 'permissionLevel', value: permissionLevel, rules: { reg: /^\d$/ } }
+                { rename: 'motto', value: motto, label: '个性签名', labelEn: 'User Motto', rules: { max: 100 } },
+                { rename: 'permissionLevel', value: permissionLevel, label: '用户权限', labelEn: 'User Permission', rules: { reg: /^\d$/ } }
             ], 'write')
             if (checkParams.mistake) {
                 throwError(ctx, 'rules', checkParams.mistake)
@@ -197,7 +249,6 @@ class UserController {
                     return
                 }
             }
-
             // 查询登录名是否存在
             let data = await UserModel.isExist({ username })
             if (data) {
@@ -207,22 +258,11 @@ class UserController {
 
             // 执行写入
             data = await UserModel.add(checkParams.data)
-            if (isRegister) {
-                throwSuccess(ctx, {
-                    msg: '注册成功',
-                    msgEn: 'Register Success',
-                    token: jwt.sign(
-                        { id: data.id, username: data.username },
-                        token.key,
-                        { expiresIn: token.expire }
-                    )
-                })
-            } else {
-                throwSuccess(ctx, {
-                    msg: '新增成功',
-                    msgEn: 'Add Success'
-                })
-            }
+
+            throwSuccess(ctx, {
+                msg: '新增成功',
+                msgEn: 'Add Success'
+            })
         } catch (err) {
             throwError(ctx, 500)
         }
