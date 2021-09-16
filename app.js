@@ -17,7 +17,10 @@ const { throwError } = require('./server/common/response')
 onerror(app)
 
 // 允许跨域
-app.use(cors())
+app.use(cors({
+    // 允许指定域名
+    origin: 'http://youhebuke.com'
+}))
 
 // token验证处理
 app.use(async (ctx, next) => {
