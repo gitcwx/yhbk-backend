@@ -92,14 +92,14 @@ class UserController {
                     label: '用户名',
                     labelEn: 'Username',
                     value: username,
-                    rules: { required: true, reg: /^[\u4e00-\u9fa5a-zA-Z0-9_]{4,16}$/ }
+                    rules: { required: true, reg: /^[\u4e00-\u9fa5a-zA-Z0-9_]{2,16}$/ }
                 },
                 {
                     rename: 'password',
                     label: '密码',
                     labelEn: 'Password',
                     value: password,
-                    rules: { required: true, reg: /^[a-zA-Z0-9~!@#$%^&*()+=|{}\-_]{4,16}$/ }
+                    rules: { required: true, reg: /^[a-zA-Z0-9~!@#$%^&*()+=|{}\-_]{6,16}$/ }
                 }
             ], 'read')
             if (checkParams.mistake) {
@@ -116,6 +116,11 @@ class UserController {
             const secret = await MD5(password, data.salt)
             if (data.password !== secret) {
                 throwError(ctx, 'notMatch', { msg: '用户名或者密码错误', msgEn: 'Username Or Password Is Incorrect' })
+                return
+            }
+            // 账户已禁用
+            if (data.status === '2') {
+                throwError(ctx, 'forbidden', { msg: '账户已冻结，请联系管理员', msgEn: 'Account Is Frozen, Please Contact The Master' })
                 return
             }
 
@@ -145,13 +150,13 @@ class UserController {
 
             // 参数规则检测
             const checkParams = checkRuleAndfilterEmpty([
-                { rename: 'username', value: username, label: '登录名', labelEn: 'Username', rules: { required: true, reg: /^[\u4e00-\u9fa5a-zA-Z0-9_]{4,16}$/ } },
+                { rename: 'username', value: username, label: '登录名', labelEn: 'Username', rules: { required: true, reg: /^[\u4e00-\u9fa5a-zA-Z0-9_]{2,16}$/ } },
                 {
                     rename: 'password',
                     value: password,
                     label: '密码',
                     labelEn: 'Password',
-                    rules: { required: true, reg: /^[a-zA-Z0-9~!@#$%^&*()+=|{}\-_]{4,16}$/ },
+                    rules: { required: true, reg: /^[a-zA-Z0-9~!@#$%^&*()+=|{}\-_]{6,16}$/ },
                     rewrite: await MD5(password, salt)
                 },
                 { rename: 'nickname', value: username, rewrite: username },
@@ -205,13 +210,13 @@ class UserController {
 
             // 参数规则检测
             const checkParams = checkRuleAndfilterEmpty([
-                { rename: 'username', value: username, label: '登录名', labelEn: 'Username', rules: { required: true, reg: /^[\u4e00-\u9fa5a-zA-Z0-9_]{4,16}$/ } },
+                { rename: 'username', value: username, label: '登录名', labelEn: 'Username', rules: { required: true, reg: /^[\u4e00-\u9fa5a-zA-Z0-9_]{2,16}$/ } },
                 {
                     rename: 'password',
                     value: password,
                     label: '密码',
                     labelEn: 'Password',
-                    rules: { required: true, reg: /^[a-zA-Z0-9~!@#$%^&*()+=|{}\-_]{4,16}$/ },
+                    rules: { required: true, reg: /^[a-zA-Z0-9~!@#$%^&*()+=|{}\-_]{6,16}$/ },
                     rewrite: await MD5(password, salt)
                 },
                 { rename: 'salt', value: password, rewrite: salt },
@@ -220,7 +225,7 @@ class UserController {
                     value: nickname,
                     label: '昵称',
                     labelEn: 'Nickname',
-                    rules: { reg: /^[\u4e00-\u9fa5a-zA-Z0-9_]{1,16}$/ },
+                    rules: { reg: /^[\u4e00-\u9fa5a-zA-Z0-9_]{2,16}$/ },
                     rewrite: nickname || username
                 },
                 { rename: 'birth', value: birth, label: '生日', labelEn: 'Birthday', rules: { reg: /^\d{4}-\d{2}-\d{2}$/ } },
@@ -291,14 +296,14 @@ class UserController {
                     label: '原始密码',
                     labelEn: 'Old Password',
                     value: password,
-                    rules: { required: true, reg: /^[a-zA-Z0-9~!@#$%^&*()+=|{}\-_]{4,16}$/ }
+                    rules: { reg: /^[a-zA-Z0-9~!@#$%^&*()+=|{}\-_]{6,16}$/ }
                 },
                 {
                     rename: 'newPassword',
                     label: '新密码',
                     labelEn: 'new Password',
                     value: newPassword,
-                    rules: { required: true, reg: /^[a-zA-Z0-9~!@#$%^&*()+=|{}\-_]{4,16}$/ }
+                    rules: { required: true, reg: /^[a-zA-Z0-9~!@#$%^&*()+=|{}\-_]{6,16}$/ }
                 }
             ], 'write')
             if (checkParams.mistake) {
@@ -316,6 +321,11 @@ class UserController {
             const auth = ctx.request.headers.authorization.replace('Bearer ', '')
             const userId = await jwt.verify(auth, token.key).id
             const userInfo = await UserModel.info(userId)
+            // 修改自己的密码需要提供原始密码
+            if (id === userInfo.id && !password) {
+                throwError(ctx, 'forbidden', { msg: '请输入原始密码', msgEn: 'Please Provide Old Password' })
+                return
+            }
             // 检测自身权限是否可以修改其他人信息
             if (id !== userInfo.id && data.permissionLevel <= userInfo.permissionLevel) {
                 throwError(ctx, 'forbidden', { msg: '无法修改更高级用户信息', msgEn: 'You Can Not Edit A Higher Permission User' })
@@ -364,7 +374,7 @@ class UserController {
             // 参数规则检测
             const checkParams = checkRuleAndfilterEmpty([
                 { value: id, label: 'ID', rules: { required: true } },
-                { rename: 'nickname', value: nickname, label: '昵称', labelEn: 'Nickname', rules: { required: true, reg: /^[\u4e00-\u9fa5a-zA-Z0-9_]{1,16}$/ } },
+                { rename: 'nickname', value: nickname, label: '昵称', labelEn: 'Nickname', rules: { required: true, reg: /^[\u4e00-\u9fa5a-zA-Z0-9_]{2,16}$/ } },
                 { rename: 'birth', value: birth, label: '生日', labelEn: 'Birthday', rules: { reg: /^\d{4}-\d{2}-\d{2}$/ } },
                 { rename: 'gender', value: gender, label: '性别', labelEn: 'Gender', rules: { reg: /^[012]$/ } },
                 { rename: 'location', value: location, label: '省市县区', labelEn: 'Location', rules: { reg: /^\d{6}-\d{6}-\d{6}$/ } },

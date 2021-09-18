@@ -74,7 +74,7 @@ module.exports = function (sequelize, DataTypes) {
             allowNull: true
         },
         status: {
-            comment: '用户状态 1:正常 2:禁言 3:冻结',
+            comment: '用户状态 1:正常 2:冻结',
             type: DataTypes.INTEGER,
             allowNull: false,
             defaultValue: 1
