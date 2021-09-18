@@ -322,20 +322,23 @@ class UserController {
             const userId = await jwt.verify(auth, token.key).id
             const userInfo = await UserModel.info(userId)
             // 修改自己的密码需要提供原始密码
-            if (id === userInfo.id && !password) {
-                throwError(ctx, 'forbidden', { msg: '请输入原始密码', msgEn: 'Please Provide Old Password' })
-                return
+            if (id === userInfo.id) {
+                if (password) {
+                    // 检查原密码是否正确
+                    const secret = await MD5(password, data.salt)
+                    if (data.password !== secret) {
+                        throwError(ctx, 'notMatch', { msg: '原密码错误', msgEn: 'Old Password Is Incorrect' })
+                        return
+                    }
+                } else {
+                    throwError(ctx, 'forbidden', { msg: '请输入原始密码', msgEn: 'Please Provide Old Password' })
+                    return
+                }
             }
+
             // 检测自身权限是否可以修改其他人信息
             if (id !== userInfo.id && data.permissionLevel <= userInfo.permissionLevel) {
                 throwError(ctx, 'forbidden', { msg: '无法修改更高级用户信息', msgEn: 'You Can Not Edit A Higher Permission User' })
-                return
-            }
-
-            // 检查原密码是否正确
-            const secret = await MD5(password, data.salt)
-            if (data.password !== secret) {
-                throwError(ctx, 'notMatch', { msg: '原密码错误', msgEn: 'Old Password Is Incorrect' })
                 return
             }
 

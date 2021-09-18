@@ -19,7 +19,7 @@ onerror(app)
 // 允许跨域
 app.use(cors({
     // 允许指定域名
-    origin: 'http://youhebuke.com'
+    origin: 'http://localhost:8080'
 }))
 
 // token验证处理
