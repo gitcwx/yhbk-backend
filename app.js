@@ -19,7 +19,15 @@ onerror(app)
 // 允许跨域
 app.use(cors({
     // 允许指定域名
-    origin: 'http://localhost:8080'
+    origin: (ctx) => {
+        if (ctx.header.origin === 'http://localhost:9090') {
+            return 'http://localhost:9090'
+        } else if (ctx.header.origin === 'http://101.34.44.47') {
+            return 'http://101.34.44.47'
+        } else if (ctx.header.origin === '') {
+            return 'http://youhebuke.com'
+        }
+    }
 }))
 
 // token验证处理
