@@ -1,6 +1,6 @@
 const router = require('koa-router')()
 const TagController = require('../server/controllers/tag')
-router.prefix('/api/tag')
+router.prefix('/tag')
 
 router.post('/list', TagController.list)
 router.post('/add', TagController.add)
