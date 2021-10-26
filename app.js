@@ -20,12 +20,14 @@ onerror(app)
 app.use(cors({
     // 允许指定域名
     origin: (ctx) => {
-        if (ctx.header.origin === 'http://localhost:9090') {
-            return 'http://localhost:9090'
-        } else if (ctx.header.origin === 'http://101.34.44.47') {
-            return 'http://101.34.44.47'
-        } else if (ctx.header.origin === '') {
-            return 'http://youhebuke.com'
+        const allowList = [
+            'http://localhost:9090',
+            'http://101.34.44.47',
+            'http://youhebuke.com',
+            'http://www.youhebuke.com'
+        ]
+        if (allowList.indexOf(ctx.header.origin) > -1) {
+            return ctx.header.origin
         }
     }
 }))
@@ -45,7 +47,7 @@ app.use(
     koaJwt({
         secret: token.key
     }).unless({
-        path: [/login/, '/api/user/register'],
+        path: [/login/, '/user/register'],
         method: 'GET'
     })
 )
