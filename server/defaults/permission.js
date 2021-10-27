@@ -12,18 +12,6 @@ module.exports = [
         parentMenuId: ''
     },
     {
-        createdAt: '2021-08-19 17:50:49',
-        updatedAt: '2021-08-24 11:22:15',
-        id: '5742fa2a-1340-4d93-8cc1-2fc2f9dffb76',
-        isMenu: true,
-        name: 'userList',
-        text: '用户管理',
-        textEn: 'User',
-        icon: 'el-icon-user-solid',
-        permissionLevel: 0,
-        parentMenuId: ''
-    },
-    {
         createdAt: '2021-08-20 16:23:35',
         updatedAt: '2021-08-20 16:23:35',
         id: '89824cc3-10fd-4bb0-b3e4-3259c3345e68',
@@ -36,15 +24,135 @@ module.exports = [
         parentMenuId: ''
     },
     {
-        createdAt: '2021-08-19 17:51:37',
-        updatedAt: '2021-08-24 11:21:22',
-        id: 'f49abc4b-d9cc-43b9-a721-5eabb4004e2b',
+        createdAt: '2021-08-21 15:13:05',
+        icon: 'el-icon-collection',
+        id: '0303536c-13bb-4f6b-acce-669e5eb844a5',
+        isMenu: true,
+        name: 'article.folder',
+        parentMenuId: '',
+        permissionLevel: 0,
+        text: '文章管理',
+        textEn: 'Article',
+        updatedAt: '2021-10-27 15:14:45'
+    },
+    {
+        createdAt: '2021-08-22 15:16:57',
+        icon: 'el-icon-notebook-1',
+        id: '05217464-0bc7-47ec-9167-df5d23fe9f7f',
+        isMenu: true,
+        name: 'article.list',
+        parentMenuId: '0303536c-13bb-4f6b-acce-669e5eb844a5',
+        permissionLevel: 0,
+        text: '文章列表',
+        textEn: 'Article List',
+        updatedAt: '2021-10-27 15:16:57'
+    },
+    {
+        createdAt: '2021-08-23 15:17:47',
+        icon: 'el-icon-plus',
+        id: '12cb39ba-2002-4839-8570-f7ed9e37825e',
+        isMenu: true,
+        name: 'article.add',
+        parentMenuId: '0303536c-13bb-4f6b-acce-669e5eb844a5',
+        permissionLevel: 0,
+        text: '新增文章',
+        textEn: 'Add Article',
+        updatedAt: '2021-10-27 15:17:47'
+    },
+    {
+        createdAt: '2021-08-24 15:18:44',
+        icon: 'el-icon-edit',
+        id: '4631dfad-4f11-4b35-ac52-e6dc92536850',
         isMenu: false,
-        name: 'password',
+        name: 'article.edit',
+        parentMenuId: '0303536c-13bb-4f6b-acce-669e5eb844a5',
+        permissionLevel: 0,
+        text: '修改文章',
+        textEn: 'Edit Article',
+        updatedAt: '2021-10-27 15:18:44'
+    },
+    {
+        createdAt: '2021-08-25 10:57:24',
+        icon: 'el-icon-message',
+        id: 'b76a2a7e-e7f0-4ef0-8154-0324baabe867',
+        isMenu: true,
+        name: 'message.folder',
+        parentMenuId: '',
+        permissionLevel: 9,
+        text: '消息管理',
+        textEn: 'Message',
+        updatedAt: '2021-10-27 14:41:03'
+    },
+    {
+        createdAt: '2021-08-26 11:08:30',
+        icon: 'el-icon-plus',
+        id: '1a3b2b6c-0e89-4b70-8fcd-a509446026a5',
+        isMenu: true,
+        name: 'message.add',
+        parentMenuId: 'b76a2a7e-e7f0-4ef0-8154-0324baabe867',
+        permissionLevel: 0,
+        text: '新增消息',
+        textEn: 'Add Message',
+        updatedAt: '2021-10-27 11:08:30'
+    },
+    {
+        createdAt: '2021-08-27 11:01:21',
+        icon: 'el-icon-receiving',
+        id: '5d315959-ecfe-4ee9-8567-c490c1a4e92f',
+        isMenu: true,
+        name: 'message.list',
+        parentMenuId: 'b76a2a7e-e7f0-4ef0-8154-0324baabe867',
+        permissionLevel: 9,
+        text: '我的消息',
+        textEn: 'My Message',
+        updatedAt: '2021-10-27 14:41:13'
+    },
+    {
+        createdAt: '2021-08-28 14:55:59',
+        icon: 'el-icon-user-solid',
+        id: 'de38efac-abee-4cdf-8424-5991d30b426f',
+        isMenu: true,
+        name: 'user.folder',
+        parentMenuId: '',
+        permissionLevel: 9,
+        text: '用户中心',
+        textEn: 'User Center',
+        updatedAt: '2021-10-27 14:55:59'
+    },
+    {
+        createdAt: '2021-08-29 17:50:49',
+        icon: 'el-icon-user',
+        id: '5742fa2a-1340-4d93-8cc1-2fc2f9dffb76',
+        isMenu: true,
+        name: 'user.list',
+        parentMenuId: 'de38efac-abee-4cdf-8424-5991d30b426f',
+        permissionLevel: 0,
+        text: '用户列表',
+        textEn: 'User',
+        updatedAt: '2021-10-27 15:01:23'
+    },
+    {
+        createdAt: '2021-08-30 15:04:48',
+        icon: 'el-icon-postcard',
+        id: '044014c0-efe3-4157-a8dc-88954785393c',
+        isMenu: true,
+        name: 'user.info',
+        parentMenuId: 'de38efac-abee-4cdf-8424-5991d30b426f',
+        permissionLevel: 2,
+        text: '用户资料',
+        textEn: 'User Info',
+        updatedAt: '2021-10-27 15:14:28'
+    },
+    {
+        createdAt: '2021-08-31 17:51:37',
+        icon: 'el-icon-lock',
+        id: 'f49abc4b-d9cc-43b9-a721-5eabb4004e2b',
+        isMenu: true,
+        name: 'user.password',
+        parentMenuId: 'de38efac-abee-4cdf-8424-5991d30b426f',
+        permissionLevel: 2,
         text: '修改密码',
         textEn: 'Modify Password',
-        icon: 'el-icon-lock',
-        permissionLevel: 2,
-        parentMenuId: ''
+        updatedAt: '2021-10-27 14:59:55'
     }
 ]

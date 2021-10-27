@@ -19,7 +19,7 @@ class PermissionController {
             const checkPage = checkPageAndRewrite(
                 ctx.request.body,
                 // 允许排序的字段
-                ['text', 'textEn', 'name', 'isMenu', 'permissionLevel', 'updatedAt']
+                ['text', 'textEn', 'name', 'isMenu', 'permissionLevel', 'parentMenuId', 'updatedAt', 'createdAt']
             )
             if (checkPage.mistake) {
                 throwError(ctx, 'rules', checkPage.mistake)
@@ -79,11 +79,11 @@ class PermissionController {
 
             // 查询条件参数过滤重组
             const checkParams = checkRuleAndfilterEmpty([
-                { rename: 'text', label: '菜单名称', labelEn: 'Menu Name In Chinese', value: text, rules: { required: true, max: 10, reg: /^[\u4e00-\u9fa50-9]{1,10}$/ } },
-                { rename: 'textEn', label: '英文菜单名称', labelEn: 'Menu Name', value: textEn, rules: { required: true, max: 20, reg: /^[a-zA-Z0-9]{1,20}$/ } },
-                { rename: 'permissionLevel', label: '菜单权限', labelEn: 'Permission', value: permissionLevel, rules: { required: true, reg: /^\d$/ } },
-                { rename: 'name', label: '菜单路由', labelEn: 'Route Name', value: name, rules: { reg: /^[a-zA-z/]{1,30}$/ } },
-                { rename: 'isMenu', label: '展示到菜单栏', labelEn: 'IsMenu', value: isMenu, rules: { reg: /^(false|true)$/ } },
+                { rename: 'text', label: '页面名称', labelEn: 'Menu Name In Chinese', value: text, rules: { required: true, max: 10, reg: /^[\u4e00-\u9fa50-9]{1,10}$/ } },
+                { rename: 'textEn', label: '英文页面名称', labelEn: 'Menu Name', value: textEn, rules: { required: true, max: 20, reg: /^[a-zA-Z0-9\s]{1,20}$/ } },
+                { rename: 'permissionLevel', label: '页面权限', labelEn: 'Permission', value: permissionLevel, rules: { required: true, reg: /^\d$/ } },
+                { rename: 'name', label: '页面路由标识', labelEn: 'Route Name', value: name, rules: { reg: /^[a-zA-z.]{1,30}$/ } },
+                { rename: 'isMenu', label: '展示到页面栏', labelEn: 'IsMenu', value: isMenu, rules: { reg: /^(false|true)$/ } },
                 { rename: 'icon', value: icon },
                 { rename: 'parentMenuId', value: parentMenuId }
             ], 'write')
@@ -105,13 +105,13 @@ class PermissionController {
 
             const checkText = await PermissionModel.isExist({ text })
             if (checkText) {
-                throwError(ctx, 'isExist', { msg: '菜单名称已存在', msgEn: 'Menu Name In Chinese Is Already Exist' })
+                throwError(ctx, 'isExist', { msg: '页面名称已存在', msgEn: 'Menu Name In Chinese Is Already Exist' })
                 return
             }
 
             const checkTextEn = await PermissionModel.isExist({ textEn })
             if (checkTextEn) {
-                throwError(ctx, 'isExist', { msg: '英文菜单名称已存在', msgEn: 'Menu Name Is Already Exist' })
+                throwError(ctx, 'isExist', { msg: '英文页面名称已存在', msgEn: 'Menu Name Is Already Exist' })
                 return
             }
 
@@ -141,11 +141,11 @@ class PermissionController {
 
             const checkParams = checkRuleAndfilterEmpty([
                 { label: 'ID', value: id, rules: { required: true } },
-                { rename: 'text', label: '菜单名称', labelEn: 'Menu Name In Chinese', value: text, rules: { max: 10, reg: /^[\u4e00-\u9fa50-9]{1,10}$/ } },
-                { rename: 'textEn', label: '英文菜单名称', labelEn: 'Menu Name', value: textEn, rules: { max: 20, reg: /^[a-zA-Z0-9]{1,20}$/ } },
-                { rename: 'permissionLevel', label: '菜单权限', labelEn: 'Permission', value: permissionLevel, rules: { reg: /^\d$/ } },
-                { rename: 'name', label: '菜单路由', labelEn: 'Route Name', value: name, rules: { reg: /^[a-zA-z/]{1,30}$/ } },
-                { rename: 'isMenu', label: '展示到菜单栏', labelEn: 'IsMenu', value: isMenu, rules: { reg: /^(false|true)$/ } },
+                { rename: 'text', label: '页面名称', labelEn: 'Menu Name In Chinese', value: text, rules: { max: 10, reg: /^[\u4e00-\u9fa50-9]{1,10}$/ } },
+                { rename: 'textEn', label: '英文页面名称', labelEn: 'Menu Name', value: textEn, rules: { max: 20, reg: /^[a-zA-Z0-9\s]{1,20}$/ } },
+                { rename: 'permissionLevel', label: '页面权限', labelEn: 'Permission', value: permissionLevel, rules: { reg: /^\d$/ } },
+                { rename: 'name', label: '页面路由标识', labelEn: 'Route Name', value: name, rules: { reg: /^[a-zA-z.]{1,30}$/ } },
+                { rename: 'isMenu', label: '展示到页面栏', labelEn: 'IsMenu', value: isMenu, rules: { reg: /^(false|true)$/ } },
                 { rename: 'icon', value: icon },
                 { rename: 'parentMenuId', value: parentMenuId }
             ], 'write')
@@ -175,15 +175,15 @@ class PermissionController {
             if (text && text !== data.text) {
                 const checkText = await PermissionModel.isExist({ text })
                 if (checkText) {
-                    throwError(ctx, 'isExist', { msg: '菜单名称已存在', msgEn: 'Menu Name In Chinese Is Already Exist' })
+                    throwError(ctx, 'isExist', { msg: '页面名称已存在', msgEn: 'Menu Name In Chinese Is Already Exist' })
                     return
                 }
             }
 
             if (textEn && textEn !== data.textEn) {
-                const checkText = await PermissionModel.isExist({ text })
+                const checkText = await PermissionModel.isExist({ textEn })
                 if (checkText) {
-                    throwError(ctx, 'isExist', { msg: '英文菜单名称已存在', msgEn: 'Menu Name Is Already Exist' })
+                    throwError(ctx, 'isExist', { msg: '英文页面名称已存在', msgEn: 'Menu Name Is Already Exist' })
                     return
                 }
             }

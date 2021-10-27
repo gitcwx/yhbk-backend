@@ -118,7 +118,7 @@ const checkPageAndRewrite = (params, orderKeys) => {
     data.page = params.page ? parseInt(params.page) : 1
     data.limit = params.limit ? parseInt(params.limit) : 10
     data.orderby = params.orderby ? params.orderby.toLowerCase() : 'desc'
-    data.orderName = params.orderName || 'updatedAt'
+    data.orderName = params.orderName || 'createdAt'
 
     return {
         mistake,

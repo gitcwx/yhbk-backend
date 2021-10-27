@@ -26,8 +26,7 @@ class PermissionModel {
             offset: (page - 1) * limit,
             where: conditions,
             order: [
-                [orderName, orderby],
-                ['createdAt', 'asc']
+                [orderName, orderby]
             ]
         })
     }

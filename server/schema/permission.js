@@ -14,12 +14,12 @@ module.exports = function (sequelize, DataTypes) {
             defaultValue: false
         },
         name: {
-            comment: '菜单标识符',
+            comment: '页面标识符',
             type: DataTypes.STRING,
             allowNull: true
         },
         text: {
-            comment: '菜单名称',
+            comment: '页面名称',
             type: DataTypes.STRING,
             allowNull: false
         },
@@ -29,7 +29,7 @@ module.exports = function (sequelize, DataTypes) {
             allowNull: false
         },
         icon: {
-            comment: '菜单图标',
+            comment: '页面图标',
             type: DataTypes.STRING,
             defaultValue: ''
         },
@@ -40,7 +40,7 @@ module.exports = function (sequelize, DataTypes) {
             defaultValue: 0
         },
         parentMenuId: {
-            comment: '父级菜单ID',
+            comment: '父级页面ID',
             type: DataTypes.UUID,
             allowNull: false,
             defaultValue: ''
