@@ -43,7 +43,7 @@ class ArticleController {
                 { rename: 'status', value: status },
                 { rename: 'isTop', value: isTop },
                 { rename: 'categoryId', value: categoryId },
-                { rename: 'tagIds', value: tagIds, rewrite: { $regexp: tagIds.replace(/,/g, '|') } },
+                { rename: 'tagIds', value: tagIds, rewrite: tagIds ? { $regexp: tagIds.replace(/,/g, '|') } : '' },
                 { rename: 'authorId', value: authorId }
             ], 'read')
 

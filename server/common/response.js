@@ -63,6 +63,8 @@ const throwError = (ctx, type, params) => {
     case 'notMatch': result = { status: 200, code: 'e23', msg: params.msg, msgEn: params.msgEn }; break
     // 无权修改
     case 'forbidden': result = { status: 200, code: 'e24', msg: params.msg, msgEn: params.msgEn }; break
+    // 超出限制
+    case 'outRange': result = { status: 200, code: 'e25', msg: params.msg, msgEn: params.msgEn }; break
 
     // token认证失败
     case 401: result = { status: 401, code: 'e81', msg: 'token认证失败', msgEn: 'Token Authorization Failed' }; break
