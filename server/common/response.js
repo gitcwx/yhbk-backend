@@ -1,3 +1,4 @@
+const { convert } = require('html-to-text')
 // 服务器状态码
 // eslint-disable-next-line no-unused-vars
 const status = {
@@ -172,10 +173,11 @@ const checkRuleAndfilterEmpty = (params, type) => {
         // }
 
         if (rules && value !== '') {
+            const tempValue = rules.isHTML ? convert(value) : value
             // 判断字符长度
             if (
-                (rules.max && value.length > rules.max) ||
-                (rules.min && value.length < rules.min)
+                (rules.max && tempValue.length > rules.max) ||
+                (rules.min && tempValue.length < rules.min)
             ) {
                 mistake = { code: 'e12', msg: `${label}长度不合规`, msgEn: `${labelEn} Length Is Not In Reason` }
                 break

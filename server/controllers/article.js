@@ -37,7 +37,6 @@ class ArticleController {
                         abstract: {
                             $like: `%${keyword}%`
                         }
-                        // content已经转base64 暂时无法查找
                     }
                 },
                 { rename: 'status', value: status },
@@ -136,8 +135,8 @@ class ArticleController {
             const checkParams = checkRuleAndfilterEmpty([
                 { rename: 'title', label: '标题', labelEn: 'Title', value: title, rules: { required: true, max: 50 } },
                 { rename: 'cover', value: cover },
-                { rename: 'abstract', label: '文章摘要', labelEn: 'Abstract', value: abstract, rules: { required: true, max: 500 } },
-                { rename: 'content', label: '文章内容', labelEn: 'Article Detail', value: content, rules: { required: true, max: 5000 } },
+                { rename: 'abstract', label: '文章摘要', labelEn: 'Abstract', value: abstract, rules: { required: true, max: 200 } },
+                { rename: 'content', label: '文章内容', labelEn: 'Article Detail', value: content, rules: { required: true, max: 5000, isHTML: true } },
                 { rename: 'authorId', label: '文章作者', labelEn: 'Author', value: authorId, rules: { required: true } },
                 { rename: 'categoryId', label: '文章分类', labelEn: 'Category', value: categoryId, rules: { required: true } },
                 { rename: 'tagIds', value: tagIds },
@@ -159,6 +158,7 @@ class ArticleController {
                 throwError(ctx, 'notExist', { msg: '作者ID不存在', msgEn: 'Author Is Not Exist' })
                 return
             }
+            params.author = author
 
             // categoryId是否存在
             const category = await CategoryModel.isExist({ id: categoryId })
@@ -216,8 +216,8 @@ class ArticleController {
                 { label: 'ID', value: id, rules: { required: true } },
                 { rename: 'title', label: '标题', labelEn: 'Title', value: title, rules: { required: true, max: 50 } },
                 { rename: 'cover', value: cover },
-                { rename: 'abstract', label: '文章摘要', labelEn: 'Abstract', value: abstract, rules: { required: true, max: 500 } },
-                { rename: 'content', label: '文章内容', labelEn: 'Article Detail', value: content, rules: { required: true, max: 5000 } },
+                { rename: 'abstract', label: '文章摘要', labelEn: 'Abstract', value: abstract, rules: { required: true, max: 200 } },
+                { rename: 'content', label: '文章内容', labelEn: 'Article Detail', value: content, rules: { required: true, max: 5000, isHTML: true } },
                 // 不写rename，后续赋值
                 { label: '文章作者', labelEn: 'Author', value: authorId, rules: { required: true } },
                 { label: '文章分类', labelEn: 'Category', value: categoryId, rules: { required: true } },
