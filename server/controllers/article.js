@@ -56,7 +56,7 @@ class ArticleController {
             const allTagIdsArr = Array.from(
                 new Set(
                     result.rows
-                        .map(v => v.tagIds.split(','))
+                        .map(v => v.tagIds ? v.tagIds.split(',') : [])
                         .flat()
                 )
             )
@@ -69,7 +69,9 @@ class ArticleController {
                     tagsMap[item.dataValues.id] = item.dataValues.name
                 })
                 result.rows.forEach(item => {
-                    item.dataValues.tags = item.dataValues.tagIds.split(',').map(v => ({ id: v, name: tagsMap[v] }))
+                    item.dataValues.tags = item.dataValues.tagIds
+                        ? item.dataValues.tagIds.split(',').map(v => ({ id: v, name: tagsMap[v] }))
+                        : []
                 })
             }
 
@@ -102,7 +104,7 @@ class ArticleController {
                 throwError(ctx, 'notExist', { msg: '该数据已不存在', msgEn: 'Data Is Already Not Exist' })
                 return
             }
-            const idsArr = data.tagIds.split(',')
+            const idsArr = data.tagIds ? data.tagIds.split(',') : []
             if (idsArr.length) {
                 const tagsArr = await TagModel.queryByIds(idsArr)
                 data.dataValues.tags = tagsArr
@@ -258,7 +260,7 @@ class ArticleController {
                 }
             }
             // tagId改变
-            if (data.tagIds !== tagIds) {
+            if (tagIds && data.tagIds !== tagIds) {
                 const idsArr = tagIds.split(',')
                 if (idsArr.length) {
                     const tagsArr = await TagModel.queryByIds(idsArr)
