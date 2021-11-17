@@ -1,4 +1,4 @@
-const { TagModel } = require('../model')
+const { TagModel, ArticleModel } = require('../model')
 const { throwSuccess, throwError, checkPageAndRewrite, checkRuleAndfilterEmpty } = require('../common/response')
 const { isMaster } = require('../common/checkUser')
 
@@ -6,8 +6,7 @@ class TagController {
     static async list(ctx) {
         try {
             const {
-                name,
-                nameEn
+                keyword
             } = ctx.request.body
 
             // 参数规则检测
@@ -23,8 +22,18 @@ class TagController {
 
             // 查询条件参数过滤重组
             const checkParams = checkRuleAndfilterEmpty([
-                { rename: 'name', value: name, rewrite: { $like: `%${name}%` } },
-                { rename: 'nameEn', value: nameEn, rewrite: { $like: `%${nameEn}%` } }
+                {
+                    rename: '$or',
+                    value: keyword,
+                    rewrite: {
+                        name: {
+                            $like: `%${keyword}%`
+                        },
+                        nameEn: {
+                            $like: `%${keyword}%`
+                        }
+                    }
+                }
             ], 'read')
 
             const result = await TagModel.list({
@@ -160,9 +169,20 @@ class TagController {
             if (!await isMaster(ctx)) { return }
 
             // 查询是否存在
-            const data = await TagModel.isExist({ id })
+            let data = await TagModel.isExist({ id })
             if (!data) {
                 throwError(ctx, 'notExist', { msg: '该数据已不存在', msgEn: 'Data Is Already Not Exist' })
+                return
+            }
+
+            // 查询分类下面有没有文章
+            data = await ArticleModel.isExist({
+                tagIds: {
+                    $regexp: id.replace(/,/g, '|')
+                }
+            })
+            if (data) {
+                throwError(ctx, 'isExist', { msg: '该标签下存在文章，不可删除', msgEn: 'Deletion Failed Because Of There Are Articles In This Tag' })
                 return
             }
 

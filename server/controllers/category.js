@@ -6,8 +6,7 @@ class CategoryController {
     static async list(ctx) {
         try {
             const {
-                name,
-                nameEn
+                keyword
             } = ctx.request.body
 
             // 参数规则检测
@@ -22,8 +21,18 @@ class CategoryController {
             }
             // 查询条件参数过滤重组
             const checkParams = checkRuleAndfilterEmpty([
-                { rename: 'name', value: name, rewrite: { $like: `%${name}%` } },
-                { rename: 'nameEn', value: nameEn, rewrite: { $like: `%${nameEn}%` } }
+                {
+                    rename: '$or',
+                    value: keyword,
+                    rewrite: {
+                        name: {
+                            $like: `%${keyword}%`
+                        },
+                        nameEn: {
+                            $like: `%${keyword}%`
+                        }
+                    }
+                }
             ], 'read')
 
             const result = await CategoryModel.list({
