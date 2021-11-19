@@ -25,7 +25,9 @@ app.use(cors({
             'http://localhost:9090',
             'http://101.34.44.47',
             'http://youhebuke.com',
-            'http://www.youhebuke.com'
+            'http://www.youhebuke.com',
+            'http://manage.youhebuke.com',
+            'http://www.manage.youhebuke.com'
         ]
         if (allowList.indexOf(ctx.header.origin) > -1) {
             return ctx.header.origin

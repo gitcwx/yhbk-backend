@@ -51,6 +51,37 @@ class TagController {
         }
     }
 
+    static async count(ctx) {
+        try {
+            const {
+                id
+            } = ctx.request.body
+
+            // 查询条件参数过滤重组
+            const checkParams = checkRuleAndfilterEmpty([
+                {
+                    rename: 'tagIds',
+                    label: '标签ID',
+                    labelEn: 'Tag ID',
+                    value: id,
+                    rules: { required: true },
+                    rewrite: id ? { $regexp: id.replace(/,/g, '|') } : ''
+                }
+            ], 'read')
+
+            const result = await ArticleModel.count(checkParams.data)
+            throwSuccess(ctx, {
+                msg: '查询成功',
+                msgEn: 'Query Success',
+                data: {
+                    count: result
+                }
+            })
+        } catch (err) {
+            throwError(ctx, 500)
+        }
+    }
+
     static async add(ctx) {
         try {
             const {

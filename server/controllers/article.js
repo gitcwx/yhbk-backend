@@ -86,6 +86,21 @@ class ArticleController {
         }
     }
 
+    static async count (ctx) {
+        try {
+            const result = await ArticleModel.count({})
+            throwSuccess(ctx, {
+                msg: '查询成功',
+                msgEn: 'Query Success',
+                data: {
+                    count: result
+                }
+            })
+        } catch (err) {
+
+        }
+    }
+
     static async detail(ctx) {
         try {
             const { id } = ctx.request.body

@@ -35,6 +35,13 @@ class ArticleModel {
         })
     }
 
+    // 查询指定分类/标签下文章数量
+    static async count (params) {
+        return await Article.count({
+            where: params
+        })
+    }
+
     // 文章详情
     static async detail(id) {
         return await Article.findOne({

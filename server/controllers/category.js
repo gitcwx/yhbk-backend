@@ -50,6 +50,36 @@ class CategoryController {
         }
     }
 
+    static async count (ctx) {
+        try {
+            const {
+                id
+            } = ctx.request.body
+
+            // 查询条件参数过滤重组
+            const checkParams = checkRuleAndfilterEmpty([
+                {
+                    rename: 'categoryId',
+                    label: '分类ID',
+                    labelEn: 'Category ID',
+                    value: id,
+                    rules: { required: true }
+                }
+            ], 'read')
+
+            const result = await CategoryModel.count(checkParams.data)
+            throwSuccess(ctx, {
+                msg: '查询成功',
+                msgEn: 'Query Success',
+                data: {
+                    count: result
+                }
+            })
+        } catch (err) {
+            throwError(ctx, 500)
+        }
+    }
+
     static async add(ctx) {
         try {
             const {

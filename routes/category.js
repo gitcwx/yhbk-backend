@@ -3,6 +3,7 @@ const CategoryController = require('../server/controllers/category')
 router.prefix('/category')
 
 router.post('/list', CategoryController.list)
+router.post('/count', CategoryController.count)
 router.post('/add', CategoryController.add)
 router.post('/edit', CategoryController.edit)
 router.post('/del', CategoryController.del)
