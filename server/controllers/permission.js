@@ -82,7 +82,7 @@ class PermissionController {
                 { rename: 'text', label: '页面名称', labelEn: 'Menu Name In Chinese', value: text, rules: { required: true, max: 10, reg: /^[\u4e00-\u9fa50-9]{1,10}$/ } },
                 { rename: 'textEn', label: '英文页面名称', labelEn: 'Menu Name', value: textEn, rules: { required: true, max: 20, reg: /^[a-zA-Z0-9\s]{1,20}$/ } },
                 { rename: 'permissionLevel', label: '页面权限', labelEn: 'Permission', value: permissionLevel, rules: { required: true, reg: /^\d$/ } },
-                { rename: 'name', label: '页面路由标识', labelEn: 'Route Name', value: name, rules: { reg: /^[a-zA-z.]{1,30}$/ } },
+                { rename: 'name', label: '页面路由标识', labelEn: 'Route Name', value: name, rules: { reg: /^[a-zA-z0-9.]{1,30}$/ } },
                 { rename: 'isMenu', label: '展示到页面栏', labelEn: 'IsMenu', value: isMenu, rules: { reg: /^(false|true)$/ } },
                 { rename: 'icon', value: icon },
                 { rename: 'parentMenuId', value: parentMenuId }
@@ -144,7 +144,7 @@ class PermissionController {
                 { rename: 'text', label: '页面名称', labelEn: 'Menu Name In Chinese', value: text, rules: { max: 10, reg: /^[\u4e00-\u9fa50-9]{1,10}$/ } },
                 { rename: 'textEn', label: '英文页面名称', labelEn: 'Menu Name', value: textEn, rules: { max: 20, reg: /^[a-zA-Z0-9\s]{1,20}$/ } },
                 { rename: 'permissionLevel', label: '页面权限', labelEn: 'Permission', value: permissionLevel, rules: { reg: /^\d$/ } },
-                { rename: 'name', label: '页面路由标识', labelEn: 'Route Name', value: name, rules: { reg: /^[a-zA-z.]{1,30}$/ } },
+                { rename: 'name', label: '页面路由标识', labelEn: 'Route Name', value: name, rules: { reg: /^[a-zA-z0-9.]{1,30}$/ } },
                 { rename: 'isMenu', label: '展示到页面栏', labelEn: 'IsMenu', value: isMenu, rules: { reg: /^(false|true)$/ } },
                 { rename: 'icon', value: icon },
                 { rename: 'parentMenuId', value: parentMenuId }

@@ -27,7 +27,7 @@ const config = {
     },
     token: {
         key: 'youhebuke',
-        expire: '24h'
+        expire: '8h'
     }
 }
 module.exports = config
