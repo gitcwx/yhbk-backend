@@ -3,6 +3,7 @@ const config = {
         database: 'yhbk',
         user: 'root',
         password: '909090',
+        // password: 'root pwd',
         options: {
             host: 'localhost',
             // host: "192.168.1.133",

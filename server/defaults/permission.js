@@ -24,31 +24,31 @@ module.exports = [
         parentMenuId: ''
     },
     {
-        createdAt: '2021-08-29 17:50:49',
-        updatedAt: '2021-12-09 14:38:00',
+        createdAt: '2021-08-22 17:50:49',
+        updatedAt: '2021-12-10 16:28:49',
         id: '5742fa2a-1340-4d93-8cc1-2fc2f9dffb76',
         isMenu: true,
         name: 'user.list',
         text: '用户管理',
-        textEn: 'User',
+        textEn: 'User List',
         icon: 'icon-team',
         permissionLevel: 0,
         parentMenuId: ''
     },
     {
-        createdAt: '2021-12-10 15:50:14',
-        updatedAt: '2021-12-10 15:50:14',
+        createdAt: '2021-08-23 15:50:14',
+        updatedAt: '2021-12-10 16:29:36',
         id: 'f4085c2f-9b9e-41f8-9292-331811bbb98b',
-        isMenu: true,
+        isMenu: false,
         name: 'user.edit',
         text: '用户编辑',
         textEn: 'User Edit',
         icon: 'icon-edit-fill',
         permissionLevel: 0,
-        parentMenuId: '5742fa2a-1340-4d93-8cc1-2fc2f9dffb76'
+        parentMenuId: ''
     },
     {
-        createdAt: '2021-12-10 15:46:40',
+        createdAt: '2021-08-24 15:46:40',
         updatedAt: '2021-12-10 15:47:04',
         id: '33694767-10f2-4af7-af69-4d4801bdd2b2',
         isMenu: false,
@@ -60,7 +60,7 @@ module.exports = [
         parentMenuId: ''
     },
     {
-        createdAt: '2021-08-21 15:13:05',
+        createdAt: '2021-08-25 15:13:05',
         updatedAt: '2021-12-09 14:33:48',
         id: '0303536c-13bb-4f6b-acce-669e5eb844a5',
         isMenu: true,
@@ -72,7 +72,7 @@ module.exports = [
         parentMenuId: ''
     },
     {
-        createdAt: '2021-08-22 15:16:57',
+        createdAt: '2021-08-26 15:16:57',
         updatedAt: '2021-12-09 14:34:08',
         id: '05217464-0bc7-47ec-9167-df5d23fe9f7f',
         isMenu: true,
@@ -84,7 +84,7 @@ module.exports = [
         parentMenuId: '0303536c-13bb-4f6b-acce-669e5eb844a5'
     },
     {
-        createdAt: '2021-08-23 15:17:47',
+        createdAt: '2021-08-27 15:17:47',
         updatedAt: '2021-12-09 14:34:24',
         id: '12cb39ba-2002-4839-8570-f7ed9e37825e',
         isMenu: true,
@@ -96,7 +96,7 @@ module.exports = [
         parentMenuId: '0303536c-13bb-4f6b-acce-669e5eb844a5'
     },
     {
-        createdAt: '2021-08-24 15:18:44',
+        createdAt: '2021-08-29 15:18:44',
         updatedAt: '2021-12-09 14:34:34',
         id: '4631dfad-4f11-4b35-ac52-e6dc92536850',
         isMenu: false,
@@ -108,7 +108,7 @@ module.exports = [
         parentMenuId: '0303536c-13bb-4f6b-acce-669e5eb844a5'
     },
     {
-        createdAt: '2021-11-16 16:31:26',
+        createdAt: '2021-08-30 16:31:26',
         updatedAt: '2021-12-09 14:34:59',
         id: 'a10eeae8-8c7d-493a-9d21-32974128c2a2',
         isMenu: true,
@@ -120,7 +120,7 @@ module.exports = [
         parentMenuId: '0303536c-13bb-4f6b-acce-669e5eb844a5'
     },
     {
-        createdAt: '2021-11-16 16:38:11',
+        createdAt: '2021-09-01 16:38:11',
         updatedAt: '2021-12-09 14:35:15',
         id: '49c2c26a-e15c-45e0-834e-3a7874501bf5',
         isMenu: true,
@@ -132,7 +132,7 @@ module.exports = [
         parentMenuId: '0303536c-13bb-4f6b-acce-669e5eb844a5'
     },
     {
-        createdAt: '2021-12-10 15:55:44',
+        createdAt: '2021-09-10 15:55:44',
         updatedAt: '2021-12-10 15:56:04',
         id: 'a455fc04-6210-4212-b18b-3e7fe793d15b',
         isMenu: false,
@@ -144,7 +144,7 @@ module.exports = [
         parentMenuId: '0303536c-13bb-4f6b-acce-669e5eb844a5'
     },
     {
-        createdAt: '2021-08-27 11:01:21',
+        createdAt: '2021-09-27 11:01:21',
         updatedAt: '2021-12-09 14:35:26',
         id: '5d315959-ecfe-4ee9-8567-c490c1a4e92f',
         isMenu: true,
@@ -156,7 +156,7 @@ module.exports = [
         parentMenuId: ''
     },
     {
-        createdAt: '2021-12-09 14:39:06',
+        createdAt: '2021-09-28 14:39:06',
         updatedAt: '2021-12-09 14:39:06',
         id: '1c13d3fb-00cb-46f2-ad89-39df88aec5c1',
         isMenu: true,
@@ -168,7 +168,7 @@ module.exports = [
         parentMenuId: ''
     },
     {
-        createdAt: '2021-12-09 14:40:40',
+        createdAt: '2021-09-29 14:40:40',
         updatedAt: '2021-12-09 14:40:40',
         id: 'dfa811b5-b367-4b43-bb97-5413e5922b07',
         isMenu: true,

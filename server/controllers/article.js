@@ -88,7 +88,27 @@ class ArticleController {
 
     static async count (ctx) {
         try {
-            const result = await ArticleModel.count({})
+            const {
+                tagIds,
+                categoryId
+            } = ctx.request.body
+            // 查询条件参数过滤重组
+            const checkParams = checkRuleAndfilterEmpty([
+                {
+                    rename: 'tagIds',
+                    label: '标签ID',
+                    labelEn: 'Tag ID',
+                    value: tagIds,
+                    rewrite: tagIds ? { $regexp: tagIds.replace(/,/g, '|') } : ''
+                },
+                {
+                    rename: 'categoryId',
+                    label: '分类ID',
+                    labelEn: 'Category ID',
+                    value: categoryId
+                }
+            ], 'read')
+            const result = await ArticleModel.count(checkParams.data)
             throwSuccess(ctx, {
                 msg: '查询成功',
                 msgEn: 'Query Success',
@@ -97,7 +117,7 @@ class ArticleController {
                 }
             })
         } catch (err) {
-
+            throwError(ctx, 500)
         }
     }
 
