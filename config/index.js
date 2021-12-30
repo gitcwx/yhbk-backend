@@ -2,7 +2,7 @@ const config = {
     DATABASE: {
         database: 'yhbk',
         user: 'root',
-        password: '909090',
+        password: process.env.NODE_ENV === 'production' ? '51cf60b1d00f6e0d' : '909090',
         // password: 'root pwd',
         options: {
             host: 'localhost',

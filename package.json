@@ -5,7 +5,8 @@
   "scripts": {
     "start": "node bin/www",
     "dev": "nodemon bin/www --inspect",
-    "prd": "pm2 start bin/www",
+    "create": "pm2 start bin/www --name api.youhebuke.com",
+    "restart": "pm2 restart api.youhebuke.com",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
