@@ -8,29 +8,30 @@ module.exports = function (sequelize, DataTypes) {
             allowNull: false,
             defaultValue: DataTypes.UUIDV4
         },
+        parentId: {
+            comment: '父级评论ID',
+            type: DataTypes.UUID,
+            allowNull: true
+        },
         articleId: {
             comment: '文章ID',
             type: DataTypes.UUID,
             allowNull: false
         },
-        user: {
-            comment: '评论者',
-            type: DataTypes.JSON
+        userId: {
+            comment: '用户ID',
+            type: DataTypes.UUID,
+            allowNull: false
         },
         content: {
             comment: '评论内容',
             type: DataTypes.TEXT,
             allowNull: false
         },
-        likeCount: {
-            comment: '点赞数',
-            type: DataTypes.INTEGER(11),
-            defaultValue: 0
-        },
-        commentCount: {
-            comment: '评论数',
-            type: DataTypes.INTEGER(11),
-            defaultValue: 0
+        forbid: {
+            comment: '留言状态',
+            type: DataTypes.BOOLEAN,
+            defaultValue: false
         },
         createdAt: {
             comment: '创建时间',

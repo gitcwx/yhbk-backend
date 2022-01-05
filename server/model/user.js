@@ -98,6 +98,18 @@ class UserModel {
             where: conditions
         })
     }
+
+    // 根据IDs查询
+    static async queryByIds(idsArr) {
+        return await User.findAll({
+            attributes: { exclude: ['salt', 'password', 'ip', 'authKey', 'deletedAt'] },
+            where: {
+                id: {
+                    $in: idsArr
+                }
+            }
+        })
+    }
 }
 
 module.exports = UserModel

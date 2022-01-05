@@ -2,15 +2,12 @@ const config = {
     DATABASE: {
         database: 'yhbk',
         user: 'root',
-        password: process.env.NODE_ENV === 'production' ? '51cf60b1d00f6e0d' : '909090',
-        // password: 'root pwd',
+        password: '909090',
+        // password: '51cf60b1d00f6e0d',
         options: {
             host: 'localhost',
-            // host: "192.168.1.133",
-            // host: "api.youhebuke.com",
             dialect: 'mysql',
             dialectOptions: {
-                // 字符集
                 charset: 'utf8mb4',
                 // collate:'utf8mb4_unicode_ci',
                 supportBigNumbers: true,
