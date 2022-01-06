@@ -1,6 +1,6 @@
 const moment = require('moment')
 module.exports = function (sequelize, DataTypes) {
-    const Permission = sequelize.define('permission', {
+    const Message = sequelize.define('message', {
         id: {
             comment: '主键ID',
             type: DataTypes.UUID,
@@ -8,42 +8,25 @@ module.exports = function (sequelize, DataTypes) {
             allowNull: false,
             defaultValue: DataTypes.UUIDV4
         },
-        isMenu: {
-            comment: '是否在菜单栏显示',
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
-        },
-        name: {
-            comment: '页面标识符',
-            type: DataTypes.STRING,
+        parentId: {
+            comment: '父级ID',
+            type: DataTypes.UUID,
             allowNull: true
         },
-        text: {
-            comment: '页面名称',
-            type: DataTypes.STRING,
-            allowNull: false
-        },
-        textEn: {
-            comment: 'Menu Name',
-            type: DataTypes.STRING,
-            allowNull: false
-        },
-        icon: {
-            comment: '页面图标',
-            type: DataTypes.STRING,
-            defaultValue: ''
-        },
-        permissionLevel: {
-            comment: '权限级别 0:超级管理员 1:管理员 2:普通用户 9:游客',
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            defaultValue: 0
-        },
-        parentMenuId: {
-            comment: '父级页面ID',
+        userId: {
+            comment: '用户ID',
             type: DataTypes.UUID,
-            allowNull: false,
-            defaultValue: ''
+            allowNull: false
+        },
+        content: {
+            comment: '留言内容',
+            type: DataTypes.TEXT,
+            allowNull: false
+        },
+        forbid: {
+            comment: '是否违规',
+            type: DataTypes.BOOLEAN,
+            defaultValue: false
         },
         createdAt: {
             comment: '创建时间',
@@ -77,9 +60,9 @@ module.exports = function (sequelize, DataTypes) {
         freezeTableName: true
     })
 
-    Permission.associate = models => {
+    Message.associate = models => {
 
     }
 
-    return Permission
+    return Message
 }

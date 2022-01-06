@@ -1,14 +1,10 @@
-const { CommentModel, ArticleModel, UserModel } = require('../model')
+const { MessageModel, UserModel } = require('../model')
 const { throwSuccess, throwError, checkPageAndRewrite, checkRuleAndfilterEmpty } = require('../common/response')
 const { isMaster } = require('../common/checkUser')
 
-class CommentController {
+class MessageController {
     static async list(ctx) {
         try {
-            const {
-                articleId
-            } = ctx.request.body
-
             // 参数规则检测
             const checkPage = checkPageAndRewrite(
                 ctx.request.body,
@@ -20,21 +16,16 @@ class CommentController {
                 return
             }
 
-            // 查询条件参数过滤重组
-            const checkParams = checkRuleAndfilterEmpty([
-                { rename: 'articleId', label: '文章ID', labelEn: 'ArticleId', value: articleId, rules: { required: true } }
-            ], 'read')
-
             // 查询评论列表
-            const result = await CommentModel.list({
-                ...checkPage.data,
-                conditions: checkParams.data
+            const result = await MessageModel.list({
+                ...checkPage.data
             })
 
-            // 去重 获取userId集合
+            // 去重
             const allUserIdsArr = Array.from(
                 new Set(
                     result.rows
+                        // 获取ids
                         .map(v => v.userId)
                         // 去空元素
                         .filter(v => v)
@@ -78,7 +69,6 @@ class CommentController {
     static async add(ctx) {
         try {
             const {
-                articleId,
                 userId,
                 parentId,
                 content
@@ -86,20 +76,12 @@ class CommentController {
 
             // 查询条件参数过滤重组
             const checkParams = checkRuleAndfilterEmpty([
-                { rename: 'articleId', label: '文章ID', labelEn: 'ArticleId', value: articleId, rules: { required: true } },
                 { rename: 'userId', label: '用户ID' },
-                { rename: 'content', label: '评论详情', labelEn: 'Comment Detail', value: content, rules: { required: true, max: 500, isHTML: true } },
+                { rename: 'content', label: '留言详情', labelEn: 'Message Detail', value: content, rules: { required: true, max: 500, isHTML: true } },
                 { rename: 'parentId', value: parentId }
             ], 'write')
             if (checkParams.mistake) {
                 throwError(ctx, 'rules', checkParams.mistake)
-                return
-            }
-
-            // 文章是否存在
-            const article = await ArticleModel.info(userId)
-            if (!article) {
-                throwError(ctx, 'notExist', { msg: '文章不存在', msgEn: 'Article Is Not Exist' })
                 return
             }
 
@@ -114,18 +96,18 @@ class CommentController {
 
             // parentID 是否存在
             if (parentId) {
-                const parent = await CommentModel.isExist({ id: parentId })
+                const parent = await MessageModel.isExist({ id: parentId })
                 if (!parent) {
-                    throwError(ctx, 'notExist', { msg: '该评论已删除', msgEn: 'This Comment Is Deleted' })
+                    throwError(ctx, 'notExist', { msg: '该留言已删除', msgEn: 'This Message Is Deleted' })
                     return
                 }
             }
 
             // 执行写入
-            await CommentModel.add(checkParams.data)
+            await MessageModel.add(checkParams.data)
             throwSuccess(ctx, {
-                msg: '提交评论成功',
-                msgEn: 'Reply Success'
+                msg: '提交成功',
+                msgEn: 'Submit Success'
             })
         } catch (err) {
             throwError(ctx, 500)
@@ -153,14 +135,14 @@ class CommentController {
             if (!await isMaster(ctx)) { return }
 
             // 查询评论是否存在
-            const data = await CommentModel.isExist({ id })
+            const data = await MessageModel.isExist({ id })
             if (!data) {
-                throwError(ctx, 'isExist', { msg: '该评论已不存在', msgEn: 'Comment Is Already Not Exist' })
+                throwError(ctx, 'isExist', { msg: '该评论已不存在', msgEn: 'Message Is Already Not Exist' })
                 return
             }
 
             // 执行写入
-            await CommentModel.edit(checkParams.data, { id })
+            await MessageModel.edit(checkParams.data, { id })
             throwSuccess(ctx, {
                 msg: '修改成功',
                 msgEn: 'Modify Success'
@@ -172,11 +154,11 @@ class CommentController {
 
     static async del(ctx) {
         try {
-            const { commentId, userId } = ctx.request.body
+            const { messageId, userId } = ctx.request.body
 
             // 参数规则检测
             const checkParams = checkRuleAndfilterEmpty([
-                { label: 'commentId', labelEn: 'commentId', value: commentId, rules: { required: true } },
+                { label: 'messageId', labelEn: 'messageId', value: messageId, rules: { required: true } },
                 { label: 'userId', labelEn: 'userId', value: userId, rules: { required: false } }
             ], 'write')
             if (checkParams.mistake) {
@@ -185,7 +167,7 @@ class CommentController {
             }
 
             // 查询是否存在
-            const data = await CommentModel.isExist({ id: commentId })
+            const data = await MessageModel.isExist({ id: messageId })
             if (!data) {
                 throwError(ctx, 'notExist', { msg: '该数据已不存在', msgEn: 'Data Is Already Not Exist' })
                 return
@@ -196,11 +178,11 @@ class CommentController {
                 await isMaster(ctx) || (userId && userId === data.userId)
             ) {
                 // 执行写入
-                await CommentModel.del(commentId)
+                await MessageModel.del(messageId)
 
                 // 删除子评论
                 if (!data.parentId) {
-                    await CommentModel.delChild(commentId)
+                    await MessageModel.delChild(messageId)
                 }
 
                 throwSuccess(ctx, {
@@ -216,4 +198,4 @@ class CommentController {
     }
 }
 
-module.exports = CommentController
+module.exports = MessageController

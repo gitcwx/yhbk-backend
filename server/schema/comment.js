@@ -29,7 +29,7 @@ module.exports = function (sequelize, DataTypes) {
             allowNull: false
         },
         forbid: {
-            comment: '留言状态',
+            comment: '是否违规',
             type: DataTypes.BOOLEAN,
             defaultValue: false
         },
@@ -54,8 +54,8 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.DATE,
             defaultValue: null,
             get() {
-                const value = this.getDataValue('birth')
-                return value ? moment(this.getDataValue('birth')).format('YYYY-MM-DD') : null
+                const value = this.getDataValue('deletedAt')
+                return value ? moment(this.getDataValue('deletedAt')).format('YYYY-MM-DD HH:mm:ss') : null
             }
         }
     }, {

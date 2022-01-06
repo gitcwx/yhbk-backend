@@ -58,22 +58,25 @@ class ArticleController {
                     result.rows
                         .map(v => v.tagIds ? v.tagIds.split(',') : [])
                         .flat()
+                        // 去空元素
+                        .filter(v => v)
                 )
             )
+
+            // 查询这些tag属性
+            const tagsMap = {}
             if (allTagIdsArr.length) {
-                // 查询这些tag属性
                 const tags = await TagModel.queryByIds(allTagIdsArr)
-                // 数组转对象
-                const tagsMap = {}
                 tags.forEach(item => {
                     tagsMap[item.dataValues.id] = item.dataValues.name
                 })
-                result.rows.forEach(item => {
-                    item.dataValues.tags = item.dataValues.tagIds
-                        ? item.dataValues.tagIds.split(',').map(v => ({ id: v, name: tagsMap[v] }))
-                        : []
-                })
             }
+            // tags 字段赋值
+            result.rows.forEach(item => {
+                item.dataValues.tags = item.dataValues.tagIds
+                    ? item.dataValues.tagIds.split(',').map(v => ({ id: v, name: tagsMap[v] }))
+                    : []
+            })
 
             throwSuccess(ctx, {
                 msg: '查询成功',

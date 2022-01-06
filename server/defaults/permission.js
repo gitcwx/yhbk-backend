@@ -136,9 +136,9 @@ module.exports = [
         updatedAt: '2021-12-10 15:56:04',
         id: 'a455fc04-6210-4212-b18b-3e7fe793d15b',
         isMenu: false,
-        name: 'article.reply',
+        name: 'article.comment',
         text: '评论管理',
-        textEn: 'Article Reply',
+        textEn: 'Article Comment',
         icon: 'icon-comment',
         permissionLevel: 0,
         parentMenuId: '0303536c-13bb-4f6b-acce-669e5eb844a5'
